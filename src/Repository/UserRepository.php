@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use App\Core\Db;
+use DateTimeImmutable;
 
 class UserRepository
 {
@@ -17,16 +18,19 @@ class UserRepository
     public function createUser(User $user): bool
     {
         try {
-            $stmt = $this->db->prepare('INSERT INTO user (first_name, last_name, email, password, role) VALUES (:first_name, :last_name, :email, :password, :role)');
+            $stmt = $this->db->prepare('INSERT INTO user (first_name, last_name, email, username, password, reset_token, profile_image , role, created_at) VALUES (:first_name, :last_name, :email, :username, :password, :reset_token, :profile_image, :role, :created_at)');
             $stmt->bindValue(':first_name', $user->getFirstName());
             $stmt->bindValue(':last_name', $user->getLastName());
             $stmt->bindValue(':email', $user->getEmail());
+            $stmt->bindValue(':username', $user->getUsername());
             $stmt->bindValue(':password', $user->getPassword());
+            $stmt->bindValue(':reset_token', $user->getResetToken());
+            $stmt->bindValue(':profile_image', $user->getProfileImage());
             $stmt->bindValue(':role', $user->getRole());
+            $stmt->bindValue(':created_at', $user->getCreatedAt()->format('Y-m-d H:i:s'));
 
             return $stmt->execute();
         } catch (\PDOException $e) {
-            // Exemple :
             throw new \PDOException("Erreur lors de la création de l'utilisateur : " . $e->getMessage());
         }
     }
@@ -37,19 +41,25 @@ class UserRepository
         $stmt->bindValue(':email', $email);
         $stmt->execute();
         $result = $stmt->fetch();
-
         if ($result !== null) {
+            $createdAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['created_at']);
+            // Vérifie si la conversion a réussi
+            if ($createdAt === false) {
+                throw new \InvalidArgumentException('La valeur de "created_at" n\'est pas un format de date et d\'heure valide.');
+            }
 
             return new User(
                 $result['first_name'],
                 $result['last_name'],
                 $result['email'],
+                $result['username'],
                 $result['password'],
-                $result['id'],
+                $createdAt,
+                $result['reset_token'],
                 $result['role'],
-                $result['reset_token']
+                $result['profile_image'],
+                $result['id'],
             );
-
         }
 
         // Aucun utilisateur correspondant trouvé
@@ -97,6 +107,26 @@ class UserRepository
 
         return ($count > 0);
     }
+    public function isUsernameTaken(string $username): bool
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM `user` WHERE `username` = :username");
+        $stmt->bindValue(':username', $username);
+        $stmt->execute();
+        $count = $stmt->fetchColumn();
 
+        return ($count > 0);
+    }
+    public function updateUserProfileImage(int $userId, string $filename): bool
+    {
+        try {
+            $stmt = $this->db->prepare('UPDATE user SET profile_image = :filename WHERE id = :userId');
+            $stmt->bindValue(':filename', $filename);
+            $stmt->bindValue(':userId', $userId);
+
+            return $stmt->execute();
+        } catch (\PDOException $e) {
+            throw new \PDOException("Erreur lors de la mise à jour de l'image de profil de l'utilisateur : " . $e->getMessage());
+        }
+    }
 
 }

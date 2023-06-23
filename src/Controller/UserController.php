@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Notification\NotificationManager;
 use App\Repository\UserRepository;
 use App\Services\UserService;
+use DateTimeImmutable;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use PDO;
@@ -22,47 +23,51 @@ class UserController extends AbstractController
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function register(): void
+    public function register(): Response
     {
         $error = null;
         $firstName = '';
         $lastName = '';
         $email = '';
+        $username = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $firstName = $_POST['first_name'] ?? '';
             $lastName = $_POST['last_name'] ?? '';
             $email = $_POST['email'] ?? '';
+            $username = $_POST['username'] ?? '';
             $password = $_POST['password'] ?? '';
             $confirmPassword = $_POST['confirm_password'] ?? '';
 
-            // Vérifier si tous les champs du formulaire sont remplis
-            if (empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($confirmPassword)) {
+            // Vérifie si tous les champs du formulaire sont remplis
+            if (empty($firstName) || empty($lastName) || empty($email) || empty($username) || empty($password) || empty($confirmPassword)) {
                 $error = 'Veuillez remplir tous les champs du formulaire.';
             } elseif ($password !== $confirmPassword) {
                 $error = 'Les mots de passe ne correspondent pas.';
             } elseif (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password)) {
                 $error = 'Le mot de passe doit contenir au moins 8 caractères avec au moins une majuscule et une minuscule.';
             } else {
-                // Vérifier si l'utilisateur existe déjà dans la base de données
+                // Vérifie si l'utilisateur existe déjà dans la base de données
                 $userRepository = new UserRepository();
 
-                $existingUser = $userRepository->isEmailTaken($email);
-
-                if ($existingUser) {
+                $existingUserMail = $userRepository->isEmailTaken($email);
+                $existingUserName = $userRepository->isUsernameTaken($username);
+                if ($existingUserMail) {
                     $error = 'Un compte avec cet e-mail existe déjà.';
+                }elseif ($existingUserName){
+                    $error = 'Un compte avec cet username existe déjà.';
                 } else {
                     // Créer un nouvel utilisateur
-                    $user = new User($firstName, $lastName, $email, password_hash($password, PASSWORD_DEFAULT));
+                    $user = new User($firstName, $lastName, $email, $username, password_hash($password, PASSWORD_DEFAULT), new DateTimeImmutable(),null,'ROLE_USER',null);
+
                     $userRepository->createUser($user);
 
-                    header('Location: /');
-                    exit;
+                    return $this->redirectToRoute('');
                 }
             }
         }
 
-        $this->render('/app/registration.html.twig',
+        return $this->render('/app/user/registration.html.twig',
             [
                 'error' => $error,
                 'first_name' => $firstName,
@@ -96,11 +101,15 @@ class UserController extends AbstractController
                     'firstName' => $user->getFirstName(),
                     'lastName' => $user->getLastName(),
                     'email' => $user->getEmail(),
-                    'role' => $user->getRole(),
+                    'username' => $user->getUsername(),
+                    'role' => $user->getLabelRole(),
+                    'created_at' => $user->getCreatedAt(),
+                    'profile_image' => $user->getProfileImage(),
+                    'is_connected' => true,
                 ];
 
                 // Rediriger l'utilisateur vers la page de son compte ou une autre page appropriée
-                return $this->redirectToRoute('mon-compte'); // Remplacez 'account' par le nom de la route correspondant à la page du compte utilisateur
+                return $this->redirectToRoute('mon-compte'); // Remplacez 'user' par le nom de la route correspondant à la page du compte utilisateur
                 // Assurez-vous de mettre à jour la redirection selon votre structure de routes
             } else {
                 // Identifiants invalides
@@ -109,7 +118,7 @@ class UserController extends AbstractController
             }
         }
 
-        return $this->render('/app/login.html.twig', ['error' => $error]);
+        return $this->render('/app/user/login.html.twig', ['error' => $error]);
     }
 
     /**
@@ -120,17 +129,27 @@ class UserController extends AbstractController
     public function account(): Response
     {
         $error = null;
-        return $this->render('/app/account.html.twig', ['error' => $error ]);
+        return $this->render('/app/user/mon-compte.html.twig', ['error' => $error ]);
     }
 
-    public function logout(): void
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function editProfile(): Response
+    {
+        // Afficher le formulaire de modification du profil avec les informations actuelles de l'utilisateur
+        return $this->render('/app/user/edit-profil.html.twig');
+    }
+
+    public function logout(): Response
     {
         // Supprimer les informations de l'utilisateur de la session
         unset($_SESSION['user']);
 
         // Rediriger l'utilisateur vers la page d'accueil ou une autre page appropriée
-        header('Location: /');
-        exit;
+        return $this->redirectToRoute('connexion');
     }
 
     /**
@@ -139,7 +158,7 @@ class UserController extends AbstractController
      * @throws LoaderError
      * @throws Exception
      */
-    public function forgetPassword(): void
+    public function forgetPassword(): Response
     {
         // Vérifiez si le formulaire de demande de réinitialisation de mot de passe a été soumis
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -172,13 +191,12 @@ class UserController extends AbstractController
                 mail($user->getEmail(), $subject, $message, $headers);
 
                 // Redirigez l'utilisateur vers une page de confirmation ou affichez un message de succès
-                header('Location: /password-reset-requested');
-                exit;
+                return $this->redirectToRoute('password-reset-requested');
             }
         }
 
         // Affichez le formulaire de demande de réinitialisation de mot de passe
-        $this->render('/app/forget-password.html.twig');
+        return $this->render('/app/user/forget-password.html.twig');
     }
 
 

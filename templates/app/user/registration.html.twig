@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block class_css %}inscription{% endblock %}
+{% block page_title %}Inscription{% endblock %}
+
+{% block body %}
+    <div class="container">
+
+        <div class="card my-4 shadow">
+            <div class="card-body">
+                <h1 class="my-4 text-center font-weight-bold">Inscription</h1>
+                <form method="post" action="" enctype="multipart/form-data">
+                    <div class="form-group row">
+                        <div class="col-md-12 col-lg-6">
+                            <label for="first_name">Prénom<span style="color: red;">*</span></label>
+                            <input type="text" id="first_name" name="first_name" class="form-control"
+                                   value="{{ first_name }}" required>
+                        </div>
+                        <div class="col-md-12 col-lg-6">
+                            <label for="last_name">Nom de famille<span style="color: red;">*</span></label>
+                            <input type="text" id="last_name" name="last_name" class="form-control"
+                                   value="{{ last_name }}" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Pseudo<span style="color: red;">*</span></label>
+                        <input type="text" id="username" name="username" class="form-control" value="{{ username }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Adresse email<span style="color: red;">*</span></label>
+                        <input type="email" id="email" name="email" class="form-control" value="{{ email }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Mot de passe<span style="color: red;">*</span></label>
+                        <input type="password" id="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password">Confirmez le mot de passe<span
+                                    style="color: red;">*</span></label>
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                               required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profile_image">Image de profil<span style="color: red;">*</span></label>
+                        <input type="file" id="profile_image" name="profile_image" class="form-control" accept="image/*"
+                               required>
+                        <div id="image_preview"></div>
+                    </div>
+                    {% if error is not null %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary">S'inscrire</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Aperçu de l'image en direct
+        function previewImage(event) {
+            let reader = new FileReader();
+            reader.onload = function () {
+                let output = document.getElementById('image_preview');
+                output.innerHTML = '<img src="' + reader.result + '" width="200">';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        document.getElementById('profile_image').addEventListener('change', previewImage);
+    </script>
+{% endblock %}
