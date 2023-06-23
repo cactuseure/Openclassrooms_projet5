@@ -36,6 +36,7 @@ $routes = [
     '/connexion' => [$userController, 'login'],
     '/inscription' => [$userController, 'register'],
     '/mon-compte' => [$userController, 'account'],
+    '/edit-profil' => [$userController, 'editProfile'],
     '/deconnexion' => [$userController, 'logout'],
     '/forget-password' => [$userController, 'forgetPassword'],
     '/password-reset-requested' => [$userController, 'passwordResetRequested'],

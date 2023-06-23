@@ -2,25 +2,34 @@
 
 namespace App\Entity;
 
+use DateTimeImmutable;
+
 class User
 {
     public const ROLE_USER = 'ROLE_USER';
     public const ROLE_ADMIN = 'ROLE_ADMIN';
-
-    private ?int $id;
-    private string $firstName;
-    private string $lastName;
-    private string $email;
-    private string $password;
-    private string $role = self::ROLE_USER;
+    private ?int $id = null;
+    private ?string $firstName = null;
+    private ?string $lastName = null;
+    private ?string $email = null;
+    private ?string $username = null;
+    private ?string $password = null;
+    private ?DateTimeImmutable $createdAt = null;
+    private ?string $role = self::ROLE_USER;
+    private ?string $profile_image = null;
+    private ?string $reset_token = self::ROLE_USER;
 
     public function __construct(
         string $firstName,
         string $lastName,
         string $email,
+        string $username,
         string $password,
-        ?int $id = null,
+        ?DateTimeImmutable $createdAt = null,
+        ?string $reset_token = null,
         ?string $role = null,
+        ?string $profile_image = null,
+        ?int $id = null,
     )
     {
         // Vérifier la validité du prénom
@@ -38,6 +47,10 @@ class User
             throw new \InvalidArgumentException('L\'adresse email n\'est pas valide.');
         }
 
+        if (empty($username)) {
+            throw new \InvalidArgumentException('Le pseudo n\'est pas valide.');
+        }
+
         // Vérifier la validité du mot de passe
         if (empty($password)) {
             throw new \InvalidArgumentException('Le mot de passe ne peut pas être vide.');
@@ -50,9 +63,17 @@ class User
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->email = $email;
+        $this->username = $username;
         $this->password = $password;
+        $this->createdAt = $createdAt;
         if ($role !== null) {
             $this->role = $role;
+        }
+        if ($reset_token !== null) {
+            $this->reset_token = $reset_token;
+        }
+        if ($profile_image !== null) {
+            $this->profile_image = $profile_image;
         }
     }
 
@@ -66,6 +87,7 @@ class User
 
     /**
      * @param string $lastName
+     * @return User
      */
     public function setLastName(string $lastName): self
     {
@@ -83,6 +105,7 @@ class User
 
     /**
      * @param int|null $id
+     * @return User
      */
     public function setId(?int $id): self
     {
@@ -100,6 +123,7 @@ class User
 
     /**
      * @param string $firstName
+     * @return User
      */
     public function setFirstName(string $firstName): self
     {
@@ -117,6 +141,7 @@ class User
 
     /**
      * @param string $email
+     * @return User
      */
     public function setEmail(string $email): self
     {
@@ -134,6 +159,7 @@ class User
 
     /**
      * @param string $password
+     * @return User
      */
     public function setPassword(string $password): self
     {
@@ -150,7 +176,20 @@ class User
     }
 
     /**
+     * @return string
+     */
+    public function getLabelRole(): string
+    {
+        return match ($this->role) {
+            'ROLE_ADMIN' => 'administrateur',
+            'ROLE_USER' => 'utilisateur',
+            default => 'inconnu',
+        };
+    }
+
+    /**
      * @param string $role
+     * @return User
      */
     public function setRole(string $role): self
     {
@@ -158,6 +197,63 @@ class User
         return $this;
     }
 
-// Getters et setters pour toutes les propriétés
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    public function setUsername(string $username): self
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getResetToken(): ?string
+    {
+        return $this->reset_token;
+    }
+
+    /**
+     * @param string|null $reset_token
+     */
+    public function setResetToken(?string $reset_token): void
+    {
+        $this->reset_token = $reset_token;
+    }
+
+    /**
+     * @return DateTimeImmutable
+     */
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param DateTimeImmutable $createdAt
+     */
+    public function setCreatedAt(DateTimeImmutable $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getProfileImage(): ?string
+    {
+        return $this->profile_image;
+    }
+
+    /**
+     * @param string $profile_image
+     */
+    public function setProfileImage(string $profile_image): void
+    {
+        $this->profile_image = $profile_image;
+    }
 
 }

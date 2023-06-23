@@ -23,7 +23,7 @@ class PostRepository
         $posts = [];
 
         foreach ($results as $result) {
-            $post = $this->getPost($format, $result);
+            $post = $this->getPost($result);
             $posts[] = $post;
         }
 
@@ -41,25 +41,20 @@ class PostRepository
         $query = $this->db->prepare('SELECT * FROM post WHERE slug = :slug');
         $query->execute(['slug' => $slug]);
         $result = $query->fetch();
-
         if (!$result) {
             return null;
         }
-
-        $format = 'Y-m-d H:i:s';
-        return $this->getPost($format, $result);
+        return $this->getPost($result);
     }
 
     /**
-     * @param string $format
      * @param mixed $result
      * @return Post
      */
-    public function getPost(string $format, mixed $result): Post
+    public function getPost( mixed $result): Post
     {
-        $createdAt = DateTimeImmutable::createFromFormat($format, $result['created_at']);
-        $updatedAt = DateTimeImmutable::createFromFormat($format, $result['updated_at']);
-        $post = new Post($result['title'], $result['slug'], $result['thumbnail'], $result['hat'], $result['content'], $createdAt, $updatedAt, $result['author_id'], $result['category_id']);
-        return $post;
+        $createdAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['created_at']);
+        $updatedAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['updated_at']);
+        return new Post($result['title'], $result['slug'], $result['thumbnail'], $result['hat'], $result['content'], $createdAt, $updatedAt, $result['author_id'], $result['category_id']);
     }
 }

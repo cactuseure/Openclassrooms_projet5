@@ -2,32 +2,21 @@
 <html lang="fr">
 <head>
     {{ include('app/_partials/_head.html.twig') }}
-
     <title>{% block page_title %}{% endblock page_title %} | Mattéo Groult</title>
-
     {% block stylesheets %}{% endblock stylesheets %}
     {% block javascripts %}{% endblock javascripts %}
 </head>
-
-
 <body>
-
     <header>
         {{ include('/app/_partials/_header.html.twig') }}
     </header>
-
-
-
     <main class="{% block class_css %}{% endblock class_css %}">
         {% block body %}
 
         {% endblock body %}
     </main>
-
-
     <footer>
         {{ include('/app/_partials/_footer.html.twig') }}
     </footer>
-
 </body>
 </html>
