@@ -33,7 +33,7 @@ abstract class AbstractController
      */
     protected function render(string $view, array $parameters = []): Response
     {
-        // Ajoute la notification aux paramètres si elle est présente dans la session
+   // Ajoute la notification aux paramètres si elle est présente dans la session
         if (isset($_SESSION['notification'])) {
             $parameters['notification'] = $_SESSION['notification'];
             unset($_SESSION['notification']); // Supprime la notification de la session après l'avoir récupérée

@@ -19,14 +19,7 @@ class UserRepository
     {
         try {
             $stmt = $this->db->prepare('INSERT INTO user (first_name, last_name, email, username, password, reset_token, profile_image , role, created_at) VALUES (:first_name, :last_name, :email, :username, :password, :reset_token, :profile_image, :role, :created_at)');
-            $stmt->bindValue(':first_name', $user->getFirstName());
-            $stmt->bindValue(':last_name', $user->getLastName());
-            $stmt->bindValue(':email', $user->getEmail());
-            $stmt->bindValue(':username', $user->getUsername());
-            $stmt->bindValue(':password', $user->getPassword());
-            $stmt->bindValue(':reset_token', $user->getResetToken());
-            $stmt->bindValue(':profile_image', $user->getProfileImage());
-            $stmt->bindValue(':role', $user->getRole());
+            $this->bindAllValue($stmt, $user);
             $stmt->bindValue(':created_at', $user->getCreatedAt()->format('Y-m-d H:i:s'));
 
             return $stmt->execute();
@@ -39,55 +32,28 @@ class UserRepository
     {
         $stmt = $this->db->prepare("SELECT * FROM `user` WHERE `email`=:email");
         $stmt->bindValue(':email', $email);
-        $stmt->execute();
-        $result = $stmt->fetch();
-        if ($result !== null) {
-            $createdAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['created_at']);
-            // Vérifie si la conversion a réussi
-            if ($createdAt === false) {
-                throw new \InvalidArgumentException('La valeur de "created_at" n\'est pas un format de date et d\'heure valide.');
-            }
+        return $this->getUserByPdo($stmt);
+    }
 
-            return new User(
-                $result['first_name'],
-                $result['last_name'],
-                $result['email'],
-                $result['username'],
-                $result['password'],
-                $createdAt,
-                $result['reset_token'],
-                $result['role'],
-                $result['profile_image'],
-                $result['id'],
-            );
-        }
+    public function getUserByResetToken(string $resetToken): ?User
+    {
+        $stmt = $this->db->prepare("SELECT * FROM `user` WHERE `reset_token` = :resetToken");
+        $stmt->bindValue(':resetToken', $resetToken);
+        return $this->getUserByPdo($stmt);
+    }
 
-        // Aucun utilisateur correspondant trouvé
-        return null;
+    public function deleteToken(int $userId): bool
+    {
+        $stmt = $this->db->prepare("UPDATE `user` SET `reset_token` = NULL WHERE `id` = :userId");
+        $stmt->bindValue(':userId', $userId);
+        return $stmt->execute();
     }
 
     public function getUserById(int $id): ?User
     {
         $stmt = $this->db->prepare("SELECT * FROM `user` WHERE `id`=:id");
         $stmt->bindValue(':id', $id);
-        $stmt->execute();
-        $result = $stmt->fetch();
-
-        if ($result !== null) {
-
-            return new User(
-                $result['first_name'],
-                $result['last_name'],
-                $result['email'],
-                $result['password'],
-                $result['id'],
-                $result['role'],
-            );
-
-        }
-
-        // Aucun utilisateur correspondant trouvé
-        return null;
+        return $this->getUserByPdo($stmt);
     }
 
     public function saveResetToken(int $userId, string $resetToken): void
@@ -98,23 +64,33 @@ class UserRepository
         $stmt->execute();
     }
 
-    public function isEmailTaken(string $email): bool
+    public function isEmailTaken(string $email, bool $exceptHimself = false): bool
     {
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM `user` WHERE `email` = :email");
+        $stmt = $this->db->prepare("SELECT * FROM `user` WHERE `email` = :email");
         $stmt->bindValue(':email', $email);
         $stmt->execute();
-        $count = $stmt->fetchColumn();
-
-        return ($count > 0);
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if ($user) {
+            if ($exceptHimself && isset($_SESSION['user']['email']) && $user['email'] === $_SESSION['user']['email']) {
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
-    public function isUsernameTaken(string $username): bool
+    public function isUsernameTaken(string $username, bool $exceptHimself = false): bool
     {
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM `user` WHERE `username` = :username");
+        $stmt = $this->db->prepare("SELECT * FROM `user` WHERE `username` = :username");
         $stmt->bindValue(':username', $username);
         $stmt->execute();
-        $count = $stmt->fetchColumn();
-
-        return ($count > 0);
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if ($user) {
+            if ($exceptHimself && isset($_SESSION['user']['username']) && $user['username'] === $_SESSION['user']['username']) {
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
     public function updateUserProfileImage(int $userId, string $filename): bool
     {
@@ -127,6 +103,81 @@ class UserRepository
         } catch (\PDOException $e) {
             throw new \PDOException("Erreur lors de la mise à jour de l'image de profil de l'utilisateur : " . $e->getMessage());
         }
+    }
+
+    public function updateUser(User $user): ?bool
+    {
+        try {
+            $stmt = $this->db->prepare('UPDATE user SET first_name = :first_name, last_name = :last_name, email = :email, username = :username, password = :password, reset_token = :reset_token, profile_image = :profile_image, role = :role WHERE id = :user_id');
+            $this->bindAllValue($stmt, $user);
+            $stmt->bindValue(':user_id', $_SESSION['user']['id']);
+            $_SESSION['user']['firstName'] = $user->getFirstName();
+            $_SESSION['user']['lastName'] = $user->getLastName();
+            $_SESSION['user']['email'] = $user->getEmail();
+            $_SESSION['user']['username'] = $user->getUsername();
+            $_SESSION['user']['role'] = $user->getRole();
+            return $stmt->execute();
+        } catch (\PDOException $e) {
+            throw new \PDOException("Erreur lors de la mise à jour de l'utilisateur : " . $e->getMessage());
+        }
+    }
+
+    /**
+     * @param false|\PDOStatement $stmt
+     * @return User|null
+     */
+    public function getUserByPdo(false|\PDOStatement $stmt): ?User
+    {
+        $stmt->execute();
+        $result = $stmt->fetch();
+        if ($result) {
+            $createdAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['created_at']);
+            // Vérifie si la conversion a réussi
+            if ($createdAt === false) {
+                throw new \InvalidArgumentException('La valeur de "created_at" n\'est pas un format de date et d\'heure valide.');
+            }
+            return new User(
+                $result['first_name'],
+                $result['last_name'],
+                $result['email'],
+                $result['username'],
+                $result['password'],
+                $createdAt,
+                $result['reset_token'],
+                $result['role'],
+                $result['profile_image'],
+                $result['id'],
+            );
+
+        }
+
+        // Aucun utilisateur trouvé
+        return null;
+    }
+
+    /**
+     * @param false|\PDOStatement $stmt
+     * @param User $user
+     * @return void
+     */
+    public function bindAllValue(false|\PDOStatement $stmt, User $user): void
+    {
+        $stmt->bindValue(':first_name', $user->getFirstName());
+        $stmt->bindValue(':last_name', $user->getLastName());
+        $stmt->bindValue(':email', $user->getEmail());
+        $stmt->bindValue(':username', $user->getUsername());
+        $stmt->bindValue(':password', $user->getPassword());
+        $stmt->bindValue(':reset_token', $user->getResetToken());
+        $stmt->bindValue(':profile_image', $user->getProfileImage());
+        $stmt->bindValue(':role', $user->getRole());
+    }
+
+    public function changePasswordBy(?int $userId, string $newPassword): bool
+    {
+        $stmt = $this->db->prepare("UPDATE `user` SET `password` = :newPassword WHERE `id` = :userId");
+        $stmt->bindValue(':newPassword', $newPassword);
+        $stmt->bindValue(':userId', $userId);
+        return $stmt->execute();
     }
 
 }
