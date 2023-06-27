@@ -2,15 +2,11 @@
 
 namespace App\Controller;
 
-use App\Core\Db;
 use App\Entity\User;
 use App\Notification\NotificationManager;
 use App\Repository\UserRepository;
-use App\Services\UserService;
 use DateTimeImmutable;
 use Exception;
-use JetBrains\PhpStorm\NoReturn;
-use PDO;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -39,7 +35,6 @@ class UserController extends AbstractController
             $password = $_POST['password'] ?? '';
             $confirmPassword = $_POST['confirm_password'] ?? '';
 
-            // Vérifie si tous les champs du formulaire sont remplis
             if (empty($firstName) || empty($lastName) || empty($email) || empty($username) || empty($password) || empty($confirmPassword)) {
                 $error = 'Veuillez remplir tous les champs du formulaire.';
             } elseif ($password !== $confirmPassword) {
@@ -47,18 +42,25 @@ class UserController extends AbstractController
             } elseif (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password)) {
                 $error = 'Le mot de passe doit contenir au moins 8 caractères avec au moins une majuscule et une minuscule.';
             } else {
-                // Vérifie si l'utilisateur existe déjà dans la base de données
                 $userRepository = new UserRepository();
 
                 $existingUserMail = $userRepository->isEmailTaken($email);
                 $existingUserName = $userRepository->isUsernameTaken($username);
                 if ($existingUserMail) {
                     $error = 'Un compte avec cet e-mail existe déjà.';
-                }elseif ($existingUserName){
+                } elseif ($existingUserName) {
                     $error = 'Un compte avec cet username existe déjà.';
                 } else {
-                    // Créer un nouvel utilisateur
-                    $user = new User($firstName, $lastName, $email, $username, password_hash($password, PASSWORD_DEFAULT), new DateTimeImmutable(),null,'ROLE_USER',null);
+                    $user = new User(
+                        $firstName,
+                        $lastName,
+                        $email,
+                        $username,
+                        password_hash($password, PASSWORD_DEFAULT),
+                        new DateTimeImmutable(),
+                        null,
+                        'ROLE_USER',
+                        null);
 
                     $userRepository->createUser($user);
 
@@ -73,6 +75,7 @@ class UserController extends AbstractController
                 'first_name' => $firstName,
                 'last_name' => $lastName,
                 'email' => $email,
+                'username' => $username,
             ]
         );
     }
@@ -88,33 +91,29 @@ class UserController extends AbstractController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userRepository = new UserRepository();
-            $email = $_POST['email'];
-            $password = $_POST['password'];
-            // Vérifier si l'utilisateur existe dans la base de données
-            $user = $userRepository->getUserByEmail($email);
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
 
-            if ($user && password_verify($password, $user->getPassword())) {
-                // Connexion réussie
-                // Stocker les informations de l'utilisateur dans la session
-                $_SESSION['user'] = [
-                    'id' => $user->getId(),
-                    'firstName' => $user->getFirstName(),
-                    'lastName' => $user->getLastName(),
-                    'email' => $user->getEmail(),
-                    'username' => $user->getUsername(),
-                    'role' => $user->getLabelRole(),
-                    'created_at' => $user->getCreatedAt(),
-                    'profile_image' => $user->getProfileImage(),
-                    'is_connected' => true,
-                ];
-
-                // Rediriger l'utilisateur vers la page de son compte ou une autre page appropriée
-                return $this->redirectToRoute('mon-compte'); // Remplacez 'user' par le nom de la route correspondant à la page du compte utilisateur
-                // Assurez-vous de mettre à jour la redirection selon votre structure de routes
+            if (empty($email) || empty($password)) {
+                $error = 'Veuillez remplir tous les champs du formulaire.';
             } else {
-                // Identifiants invalides
-                // Afficher un message d'erreur à l'utilisateur
-                $error = 'Identifiants invalides';
+                $user = $userRepository->getUserByEmail($email);
+                if ($user && password_verify($password, $user->getPassword())) {
+                    $_SESSION['user'] = [
+                        'id' => $user->getId(),
+                        'firstName' => $user->getFirstName(),
+                        'lastName' => $user->getLastName(),
+                        'email' => $user->getEmail(),
+                        'username' => $user->getUsername(),
+                        'role' => $user->getLabelRole(),
+                        'created_at' => $user->getCreatedAt(),
+                        'profile_image' => $user->getProfileImage(),
+                        'is_connected' => true,
+                    ];
+                    return $this->redirectToRoute('mon-compte');
+                } else {
+                    $error = 'Identifiants invalides';
+                }
             }
         }
 
@@ -129,7 +128,12 @@ class UserController extends AbstractController
     public function account(): Response
     {
         $error = null;
-        return $this->render('/app/user/mon-compte.html.twig', ['error' => $error ]);
+        return $this->render('/app/user/mon-compte.html.twig',
+            [
+                'error' => $error,
+                'get' => $_GET,
+            ]
+        );
     }
 
     /**
@@ -139,16 +143,99 @@ class UserController extends AbstractController
      */
     public function editProfile(): Response
     {
-        // Afficher le formulaire de modification du profil avec les informations actuelles de l'utilisateur
-        return $this->render('/app/user/edit-profil.html.twig');
+
+        $error = null;
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $firstName = $_POST['firstName'] ?? '';
+            $lastName = $_POST['lastName'] ?? '';
+            $email = $_POST['email'] ?? '';
+            $username = $_POST['username'] ?? '';
+
+            // Vérifie si tous les champs du formulaire sont remplis
+            if (empty($firstName) || empty($lastName) || empty($email) || empty($username)) {
+                $error = 'Veuillez remplir tous les champs du formulaire.';
+            } else {
+                // Vérifie si l'utilisateur existe déjà dans la base de données
+                $userRepository = new UserRepository();
+
+                $existingUserMail = $userRepository->isEmailTaken($email, true);
+                $existingUserName = $userRepository->isUsernameTaken($username, true);
+
+                if ($existingUserMail) {
+                    $error = 'Un compte avec cet e-mail existe déjà.';
+                } elseif ($existingUserName) {
+                    $error = 'Un compte avec cet username existe déjà.';
+                } else {
+                    // Créer un nouvel utilisateur
+                    $user = new User($firstName, $lastName, $email, $username);
+                    try {
+                        $userRepository->updateUser($user);
+                    } catch (\PDOException $e) {
+                        throw new \PDOException("Erreur lors de la mise à jour de l'utilisateur : " . $e->getMessage());
+                    }
+                    return $this->redirectToRoute('mon-compte',
+                        [
+                            'message-edit' => 'success'
+                        ]
+                    );
+                }
+            }
+        }
+        // Affiche le formulaire de modification du profil
+        return $this->render('/app/user/edit-profil.html.twig',
+            [
+                'error' => $error,
+            ]
+        );
+    }
+
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function editPassword(): Response
+    {
+        $successMessage = null;
+        $errorMessage = null;
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_SESSION['user']['is_connected']) {
+            $last_password = $_POST['last_password'];
+            $password = $_POST['password'];
+            $confirmPassword = $_POST['confirmPassword'];
+            $userRepository = new UserRepository();
+            $email = $_SESSION['user']['email'];
+
+            if (empty($last_password) || empty($password) || empty($confirmPassword)) {
+                $errorMessage = 'Veuillez remplir tous les champs du formulaire.';
+            } elseif ($password !== $confirmPassword) {
+                $errorMessage = 'Les mots de passe ne correspondent pas.';
+            } elseif (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password)) {
+                $errorMessage = 'Le mot de passe doit contenir au moins 8 caractères avec au moins une majuscule et une minuscule.';
+            } else {
+                $user = $userRepository->getUserByEmail($email);
+                if ($user && password_verify($last_password, $user->getPassword())) {
+                    $userRepository->changePasswordBy($user->getId(), password_hash($password, PASSWORD_DEFAULT));
+                    $successMessage = 'Mot de passe modifié avec succès';
+                    return $this->redirectToRoute('mon-compte', [
+                        'message_success' => $successMessage,
+                        'message_error' => $errorMessage
+                    ]);
+                }
+                $errorMessage = 'L\'ancien mot de passe est incorrect';
+            }
+        }
+        return $this->render('/app/user/edit-password.html.twig', [
+            'message_success' => $successMessage,
+            'message_error' => $errorMessage
+        ]);
+
     }
 
     public function logout(): Response
     {
-        // Supprimer les informations de l'utilisateur de la session
         unset($_SESSION['user']);
-
-        // Rediriger l'utilisateur vers la page d'accueil ou une autre page appropriée
         return $this->redirectToRoute('connexion');
     }
 
@@ -160,6 +247,8 @@ class UserController extends AbstractController
      */
     public function forgetPassword(): Response
     {
+        $successMessage = null;
+        $errorMessage = null;
         // Vérifiez si le formulaire de demande de réinitialisation de mot de passe a été soumis
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = $_POST['email'] ?? '';
@@ -178,40 +267,68 @@ class UserController extends AbstractController
                 // Envoyez l'e-mail de réinitialisation de mot de passe
                 $resetUrl = 'https://projet5.matteo-groult.com/reset-password?token=' . $resetToken;
                 $subject = 'Réinitialisation de mot de passe';
-                $message = "Bonjour " . $user->getFirstName() . ",\n\n"
+                $body = "Bonjour " . $user->getFirstName() . ",\n\n"
                     . "Vous avez demandé une réinitialisation de mot de passe. Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :\n\n"
                     . $resetUrl . "\n\n"
                     . "Si vous n'avez pas demandé cette réinitialisation, veuillez ignorer cet e-mail.\n\n"
                     . "Cordialement,\n";
 
-
-                // Utilisez une bibliothèque ou un service pour envoyer l'e-mail
-                // Exemple avec la fonction mail() de PHP (requiert une configuration SMTP)
                 $headers = 'From: noreply@projet5.matteo-groult.com' . "\r\n";
-                mail($user->getEmail(), $subject, $message, $headers);
-
-                // Redirigez l'utilisateur vers une page de confirmation ou affichez un message de succès
-                return $this->redirectToRoute('password-reset-requested');
+                mail($user->getEmail(), $subject, $body, $headers);
+                $successMessage = 'Regardez votre boite mail';
+            } else {
+                $errorMessage = 'Aucun compte trouvé';
             }
         }
 
         // Affichez le formulaire de demande de réinitialisation de mot de passe
-        return $this->render('/app/user/forget-password.html.twig');
+        return $this->render('/app/user/forget-password.html.twig', [
+            'message_success' => $successMessage,
+            'message_error' => $errorMessage
+        ]);
     }
 
 
-    #[NoReturn] public function passwordResetRequested(): void
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function resetPassword(): Response
     {
-        // Enregistrement de la notification dans la session
-        $_SESSION['notification'] = [
-            'type' => 'success',
-            'message' => 'Votre demande de réinitialisation de mot de passe a été soumise avec succès.',
-            'exist' => true
-        ];
+        $successMessage = null;
+        $errorMessage = null;
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $password = $_POST['password'] ?? '';
+            $confirmPassword = $_POST['password_confirm'] ?? '';
 
-        // Redirection vers la page d'accueil avec la notification
-        header('Location: /');
-        exit;
+            if (empty($password) || empty($confirmPassword)) {
+                $errorMessage = 'Veuillez remplir tous les champs du formulaire.';
+            } elseif ($password !== $confirmPassword) {
+                $errorMessage = 'Les mots de passe ne correspondent pas.';
+            } elseif (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password)) {
+                $errorMessage = 'Le mot de passe doit contenir au moins 8 caractères avec au moins une majuscule et une minuscule.';
+            } elseif (!isset($_GET['token'])) {
+                $errorMessage = 'Token expiré';
+            } else {
+                $token = $_GET['token'];
+                $userRepository = new UserRepository();
+                $user = $userRepository->getUserByResetToken($token);
+                if ($user !== null) {
+                    $userRepository->changePasswordBy($user->getId(), password_hash($password, PASSWORD_DEFAULT));
+                    $userRepository->deleteToken($user->getId());
+                    $successMessage = 'Mot de passe modifié avec succès';
+                } else {
+                    $errorMessage = 'Token invalide';
+                }
+            }
+
+        }
+
+        return $this->render('/app/user/reset-password.html.twig', [
+            'message_success' => $successMessage,
+            'message_error' => $errorMessage
+        ]);
     }
 
 
