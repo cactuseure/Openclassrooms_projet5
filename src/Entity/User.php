@@ -15,16 +15,16 @@ class User
     private ?string $username = null;
     private ?string $password = null;
     private ?DateTimeImmutable $createdAt = null;
-    private ?string $role = self::ROLE_USER;
+    private ?string $role = null;
     private ?string $profile_image = null;
-    private ?string $reset_token = self::ROLE_USER;
+    private ?string $reset_token = null;
 
     public function __construct(
-        string $firstName,
-        string $lastName,
-        string $email,
-        string $username,
-        string $password,
+        ?string $firstName = null,
+        ?string $lastName = null,
+        ?string $email = null,
+        ?string $username = null,
+        ?string $password = null,
         ?DateTimeImmutable $createdAt = null,
         ?string $reset_token = null,
         ?string $role = null,
@@ -49,11 +49,6 @@ class User
 
         if (empty($username)) {
             throw new \InvalidArgumentException('Le pseudo n\'est pas valide.');
-        }
-
-        // Vérifier la validité du mot de passe
-        if (empty($password)) {
-            throw new \InvalidArgumentException('Le mot de passe ne peut pas être vide.');
         }
 
         // Assigner les valeurs aux propriétés de l'objet User
@@ -152,7 +147,7 @@ class User
     /**
      * @return string
      */
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
