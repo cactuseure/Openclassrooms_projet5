@@ -21,9 +21,10 @@ $request = Request::createFromGlobals();
 $url = $request->getPathInfo();
 
 // Instanciation des contrôleurs
-$homeController = new \App\Controller\HomeController();
-$postController = new \App\Controller\PostController();
-$userController = new \App\Controller\UserController();
+$homeController  = new \App\Controller\HomeController();
+$postController  = new \App\Controller\PostController();
+$userController  = new \App\Controller\UserController();
+$adminController = new \App\Controller\AdminController();
 
 // Récupère les données POST et GET
 $postData = $request->request->all();
@@ -46,6 +47,11 @@ $routes = [
     '/reset-password' => [$userController, 'resetPassword'],
     '/password-reset-requested' => [$userController, 'passwordResetRequested'],
     '/article' => [$postController, 'show'], // Nouvelle route pour afficher un post
+    '/admin/articles' => [$adminController, 'listPosts'], // Nouvelle route pour afficher un post
+    '/admin/edit-post' => [$adminController, 'editPost'], // Nouvelle route pour afficher un post
+    '/admin/add-post' => [$adminController, 'addPost'], // Nouvelle route pour afficher un post
+    '/admin/remove-post' => [$adminController, 'deletePost'], // Nouvelle route pour afficher un post
+    '/admin/toggle-post' => [$adminController, 'swapStatus'], // Nouvelle route pour afficher un post
 ];
 
 // Vérifie si l'URL correspond à une route définie

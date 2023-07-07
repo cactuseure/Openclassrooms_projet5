@@ -1,4 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+header > nav {
+  min-height: 7vh;
+}
+
 .inscription form {
   margin: 50px auto;
   max-width: 500px;
@@ -58,6 +62,42 @@
 
 body main > .container {
   margin: 100px auto 0 auto;
+}
+
+main.admin table {
+  width: 100%;
+}
+main.admin form {
+  padding: 30px;
+  border: 1px solid #cccccc;
+  border-radius: 25px;
+}
+main.admin form h1 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+main.admin .container {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+main.admin .container div.row div.col-lg-3 {
+  width: 250px !important;
+  max-width: 100% !important;
+  flex: unset !important;
+}
+main.admin .container div.row div.col-lg-3 #account-menu {
+  min-height: 93vh !important;
+  position: fixed;
+}
+main.admin .container div.row div.col-lg-3 #account-menu #logout-tab {
+  margin-top: auto;
+}
+main.admin .container div.row .col-lg-9 {
+  width: calc(100% - 250px) !important;
+  max-width: 100% !important;
+  flex: unset !important;
+  padding: 20px !important;
 }
 
 /*# sourceMappingURL=style.css.map */

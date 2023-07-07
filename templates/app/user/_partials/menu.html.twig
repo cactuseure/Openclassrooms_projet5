@@ -1,7 +1,7 @@
 <div class="nav flex-column nav-pills" id="account-menu" role="tablist" aria-orientation="vertical">
     <a class="nav-link" id="profile-tab" href="/mon-compte">Mon compte</a>
     {% if session.user.role == 'administrateur' %}
-        <a class="nav-link" id="profile-tab" href="/mon-compte">Tous les articles</a>
+        <a class="nav-link" id="profile-tab" href="/admin/articles">Tous les articles</a>
         <a class="nav-link" id="profile-tab" href="/mon-compte">Catégories</a>
         <a class="nav-link" id="profile-tab" href="/mon-compte">Commentaires</a>
     {% endif %}

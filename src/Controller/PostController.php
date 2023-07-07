@@ -25,11 +25,7 @@ class PostController extends AbstractController
      */
     public function index(): Response
     {
-        return $this->render('app/post/index.html.twig', ['posts' => $this->postRepository->findAll()]);
-    }
-
-    public function create(): void
-    {
+        return $this->render('app/post/posts.html.twig', ['posts' => $this->postRepository->getPosts()]);
     }
 
     /**

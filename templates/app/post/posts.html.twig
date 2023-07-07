@@ -21,7 +21,7 @@
                         <div class="card-body">
                             <h3 class="card-title">{{ post.title }}</h3>
                             <p class="card-text">{{ post.updatedAt|date('d/m/Y') }}</p>
-                            <p class="card-text">{{ post.hat }}</p>
+                            <div class="card-text">{{ post.hat|raw }}</div>
                         </div>
                     </div>
                 </a>

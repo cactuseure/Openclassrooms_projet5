@@ -7,36 +7,73 @@ use DateTimeImmutable;
 
 class Post
 {
-    private int $id;
-    private string $title;
-    private string $slug;
-    private string $thumbnail;
-    private string $hat;
-    private string $content;
-    private DateTimeImmutable $createdAt;
-    private DateTimeImmutable $updatedAt;
-    private int $authorId;
-    private ?int $categoryId;
+    private ?int $id = null;
+    private ?string $title = null;
+    private ?string $slug = null;
+    private ?string $thumbnail = null;
+    private ?string $hat = null;
+    private ?string $content = null;
+    private ?DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $updatedAt = null;
+    private ?bool $isActive = null;
+    private ?int $authorId = null;
+    private ?int $categoryId = null;
 
-    public function __construct(string $title, string $slug, string $thumbnail, string $hat, string $content, DateTimeImmutable $createdAt, DateTimeImmutable $updatedAt, int $authorId, ?int $categoryId)
+    public function __construct(
+        ?string $title = null,
+        ?string $slug = null,
+        ?string $thumbnail = null,
+        ?string $hat = null,
+        ?string $content = null,
+        ?DateTimeImmutable $createdAt = null,
+        ?DateTimeImmutable $updatedAt = null,
+        ?bool $isActive = null,
+        ?int $authorId = null,
+        ?int $categoryId = null,
+        ?int $id = null,
+    )
     {
-        $this->title = $title;
-        $this->slug = $slug;
-        $this->thumbnail = $thumbnail;
-        $this->hat = $hat;
-        $this->content = $content;
-        $this->createdAt = $createdAt;
-        $this->updatedAt = $updatedAt;
-        $this->authorId = $authorId;
-        $this->categoryId = $categoryId;
+        if ($title !== null) {
+            $this->title = $title;
+        }
+        if ($slug !== null) {
+            $this->slug = $slug;
+        }
+        if ($thumbnail !== null) {
+            $this->thumbnail = $thumbnail;
+        }
+        if ($hat !== null) {
+            $this->hat = $hat;
+        }
+        if ($content !== null) {
+            $this->content = $content;
+        }
+        if ($createdAt !== null) {
+            $this->createdAt = $createdAt;
+        }
+        if ($updatedAt !== null) {
+            $this->updatedAt = $updatedAt;
+        }
+        if ($isActive !== null) {
+            $this->isActive = $isActive;
+        }
+        if ($authorId !== null) {
+            $this->authorId = $authorId;
+        }
+        if ($categoryId !== null) {
+            $this->categoryId = $categoryId;
+        }
+        if ($id !== null) {
+            $this->id = $id;
+        }
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -46,7 +83,7 @@ class Post
         $this->title = $title;
     }
 
-    public function getSlug(): string
+    public function getSlug(): ?string
     {
         return $this->slug;
     }
@@ -56,7 +93,7 @@ class Post
         $this->slug = $slug;
     }
 
-    public function getThumbnail(): string
+    public function getThumbnail(): ?string
     {
         return $this->thumbnail;
     }
@@ -126,4 +163,13 @@ class Post
         $this->categoryId = $categoryId;
     }
 
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): void
+    {
+        $this->isActive = $isActive;
+    }
 }
