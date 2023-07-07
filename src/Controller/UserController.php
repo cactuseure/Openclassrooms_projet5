@@ -3,11 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Notification\NotificationManager;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -125,7 +125,7 @@ class UserController extends AbstractController
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function account(): Response
+    public function account(Request $request): Response
     {
         $error = null;
         return $this->render('/app/user/mon-compte.html.twig',
@@ -249,22 +249,17 @@ class UserController extends AbstractController
     {
         $successMessage = null;
         $errorMessage = null;
-        // Vérifiez si le formulaire de demande de réinitialisation de mot de passe a été soumis
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = $_POST['email'] ?? '';
 
-            // Vérifiez si l'e-mail existe dans la base de données
             $userRepository = new UserRepository();
             $user = $userRepository->getUserByEmail($email);
 
             if ($user !== null) {
-                // Générez un jeton de réinitialisation de mot de passe unique
                 $resetToken = bin2hex(random_bytes(32));
 
-                // Enregistrez le jeton de réinitialisation dans la base de données pour l'utilisateur
                 $userRepository->saveResetToken($user->getId(), $resetToken);
 
-                // Envoyez l'e-mail de réinitialisation de mot de passe
                 $resetUrl = 'https://projet5.matteo-groult.com/reset-password?token=' . $resetToken;
                 $subject = 'Réinitialisation de mot de passe';
                 $body = "Bonjour " . $user->getFirstName() . ",\n\n"
@@ -281,7 +276,6 @@ class UserController extends AbstractController
             }
         }
 
-        // Affichez le formulaire de demande de réinitialisation de mot de passe
         return $this->render('/app/user/forget-password.html.twig', [
             'message_success' => $successMessage,
             'message_error' => $errorMessage
