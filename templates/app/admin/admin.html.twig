@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+{% block class_css %}admin{% endblock %}
+
+{% block body %}
+    <div class="container">
+        {% if (session.user.is_connected) and session.user.role =='administrateur' %}
+            <div class="row">
+                <div class="col-lg-3">
+                    {{ include('app/user/_partials/menu.html.twig') }}
+                </div>
+                <div class="col-lg-9">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        {% else %}
+            <p>Vous n'êtes pas autorisé.</p>
+        {% endif %}
+    </div>
+{% endblock %}

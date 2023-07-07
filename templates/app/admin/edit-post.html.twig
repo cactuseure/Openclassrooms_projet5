@@ -1,0 +1,76 @@
+{% extends 'app/admin/admin.html.twig' %}
+{% block page_title %}EDIT POST{% endblock page_title %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tinymce@5.9.0/themes/silver/theme.min.css">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@5.9.0/tinymce.min.js"></script>
+    <script src="/assets/js/tinymce/langs/fr_FR.js"></script>
+    <script>
+        tinymce.init({
+            selector: '#content',
+            height: 400,
+            language: 'fr_FR', // Ajoutez cette option pour spécifier la langue française
+            plugins: [
+                'advlist autolink lists link image charmap print preview anchor',
+                'searchreplace visualblocks code fullscreen',
+                'insertdatetime media table paste code help wordcount'
+            ],
+            toolbar: 'undo redo | formatselect | bold italic backcolor | \
+            alignleft aligncenter alignright alignjustify | \
+            bullist numlist outdent indent | removeformat | help'
+        });
+        tinymce.init({
+            selector: '#hat',
+            height: 400,
+            language: 'fr_FR', // Ajoutez cette option pour spécifier la langue française
+            plugins: [
+                'advlist autolink lists link image charmap print preview anchor',
+                'searchreplace visualblocks code fullscreen',
+                'insertdatetime media table paste code help wordcount'
+            ],
+            toolbar: 'undo redo | formatselect | bold italic backcolor | \
+            alignleft aligncenter alignright alignjustify | \
+            bullist numlist outdent indent | removeformat | help'
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <form method="post" action="/admin/edit-post?post_id={{ post.id }}">
+        <h1>Modification d'article</h1>
+        {% if message_success %}
+        <div class="alert alert-success">{{ message_success }}</div>
+        {% endif %}
+        {% if message_error %}
+        <div class="alert alert-danger">{{ message_error }}</div>
+        {% endif %}
+        {% if post %}
+        <div class="form-group">
+            <label for="title">Titre :</label>
+            <input type="text" id="title" name="title" class="form-control" value="{{ post.title }}" required>
+            <input type="hidden" id="slug" name="slug" value="{{ post.slug }}" required>
+        </div>
+            <div class="form-group">
+                <label for="thumbnail">Miniature :</label>
+                <input type="text" id="thumbnail" name="thumbnail" class="form-control" value="{{ post.thumbnail }}" required>
+            </div>
+        <div class="form-group">
+            <label for="hat">Hat :</label>
+            <textarea id="hat" name="hat" class="form-control" required>{{ post.hat }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="content">Contenu :</label>
+            <textarea id="content" name="content" class="form-control" rows="8" required>{{ post.content }}</textarea>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Enregistrer" class="btn btn-primary">
+        </div>
+    </form>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,46 @@
+main.admin {
+
+  table {
+    width: 100%;
+  }
+
+  form {
+    h1{
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    padding: 30px;
+    border: 1px solid #cccccc;
+    border-radius: 25px;
+  }
+
+  .container {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+
+    div.row {
+      div.col-lg-3 {
+        width: 250px !important;
+        max-width: 100% !important;
+        flex: unset !important;
+
+        #account-menu {
+          min-height: 93vh !important;
+          position: fixed;
+          #logout-tab {
+            margin-top: auto;
+          }
+        }
+
+      }
+
+      .col-lg-9 {
+        width: calc(100% - 250px) !important;
+        max-width: 100% !important;
+        flex: unset !important;
+        padding: 20px !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{% extends 'app/admin/admin.html.twig' %}
+{% block page_title %}Articles ADMIN{% endblock page_title %}
+{% block content %}
+    <div class="row">
+        <a class="btn btn-primary" href="/admin/add-post" role="button">Ajouter</a>
+    </div>
+    {% if message_success %}
+        <div class="alert alert-success">{{ message_success }}</div>
+    {% endif %}
+    {% if message_error %}
+        <div class="alert alert-danger">{{ message_error }}</div>
+    {% endif %}
+    <table>
+        <thead>
+        <tr>
+            <th>Titre</th>
+            <th>Hat</th>
+            <th>Contenu</th>
+            <th>Date de dernière modification</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for post in posts %}
+            <tr>
+                <td>{{ post.title }}</td>
+                <td>{{ post.hat|split(' ')|slice(0, 10)|join(' ')|raw }} ...</td>
+                <td>{{ post.content|split(' ')|slice(0, 30)|join(' ')|raw }} ...</td>
+                <td>{{ post.updatedAt|date('d/m/Y H:i:s') }}</td>
+                <td>
+                    <a href="/admin/edit-post?post_id={{ post.id }}">Modifier</a>
+                    <a href="/admin/remove-post?post_id={{ post.id }}" onclick="return confirm('Êtes-vous sur de vouloirs supprimés définitivement cet article ?');">Supprimer</a>
+                    {% if post.isActive %}
+                        <a href="/admin/toggle-post?post_id={{ post.id }}">Désactiver</a>
+                    {% else %}
+                        <a href="/admin/toggle-post?post_id={{ post.id }}">Activer</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+{% endblock %}

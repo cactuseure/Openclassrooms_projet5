@@ -92,6 +92,7 @@ class UserRepository
         }
         return false;
     }
+
     public function updateUserProfileImage(int $userId, string $filename): bool
     {
         try {
