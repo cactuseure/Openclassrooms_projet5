@@ -181,4 +181,10 @@ class UserRepository
         return $stmt->execute();
     }
 
+    public function getUsers()
+    {
+        $stmt = $this->db->query("SELECT * FROM `user`");
+        return $this->getUserByPdo($stmt);
+    }
+
 }

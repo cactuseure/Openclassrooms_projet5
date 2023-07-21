@@ -2,7 +2,11 @@
 
 {% block page_title %}{{ post.title }}{% endblock %}
 {% block class_css %}post{% endblock %}
-
+{% block javascripts %}
+    <script src="/assets/js/tinymce/langs/fr_FR.js"></script>
+    <script src="/vendor/tinymce/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="/assets/js/comments.js"></script>
+{% endblock javascripts %}
 {% block body %}
     <div class="post-image">
         <img src="{{ post.thumbnail }}" alt="{{ post.title }}" class="img-fluid">
@@ -12,13 +16,80 @@
     </div>
     <div class="container">
         <div class="post-content">
-            <h2>{{ post.hat|raw }}</h2>
-            <p>Créé le {{ post.createdAt|date('d/m/Y') }}</p>
-            <p>Dernière modification le {{ post.updatedAt|date('d/m/Y') }}</p>
+            <h2>{{ post.getHat()|raw }}</h2>
+            <p>Créé le {{ post.getCreatedAt()|date('d/m/Y') }}</p>
+            <p>Dernière modification le {{ post.getUpdatedAt()|date('d/m/Y') }}</p>
             <div class="content">
-                {{ post.content|raw }}
+                {{ post.getContent()|raw }}
             </div>
 
+            <div class="block">
+                <div class="block-header">
+                    <div class="title">
+                        <h2>Commentaires</h2>
+                        <div class="tag">{{ comments|length }}</div>
+                    </div>
+                </div>
+                {% include 'app/post/_partials/_comment_form.html.twig' with {'post': post, 'commentId': null} %}
+                {% if message_success %}
+                    <div class="alert alert-success">{{ message_success }}</div>
+                {% endif %}
+                {% if message_error %}
+                    <div class="alert alert-danger">{{ message_error }}</div>
+                {% endif %}
+                {% if comments|length > 0 %}
+                    {% for comment in comments %}
+                        {% if comment.getParentId() == null %}
+                            <div class="comment">
+                                <div class="user-banner">
+                                    <div class="user">
+                                        <div class="avatar">
+                                            <img src="https://randomuser.me/api/portraits/men/86.jpg">
+                                        </div>
+                                        <h5>{{ userRepository.getUserById(comment.getAuthorId()).getUsername() }}</h5>
+                                    </div>
+                                    <button class="btn dropdown"><i class="ri-more-line"></i></button>
+                                </div>
+                                <div class="content">
+                                    {{ comment.getContent()|raw }}
+                                </div>
+                                <div class="footer">
+                                    <span data-comment-id="{{ comment.getId() }}" class="reply_btn">Répondre</span>
+                                    <div class="divider"></div>
+                                    <span class="is-mute">{% include 'app/post/_partials/_comment_date.html.twig' with {'comment': comment} %}</span>
+                                </div>
+                            </div>
+                            {% if comment.hasChildren() %}
+                            {% include 'app/post/_partials/_comment_form.html.twig' with {'post': post, 'commentId': comment.getId()} %}
+                        {% endif %}
+                            {% for childComment in comment.getChildren() %}
+                                {% set childComment = commentRepository.getCommentById(childComment) %}
+                                {% set authorChildComment = userRepository.getUserById(childComment.getAuthorId) %}
+                                <div class="reply comment">
+                                    <div class="user-banner">
+                                        <div class="user">
+                                            <div class="avatar">
+                                                <img src="https://images.unsplash.com/photo-1510227272981-87123e259b17?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=3759e09a5b9fbe53088b23c615b6312e" alt="">
+                                            </div>
+                                            <h5>{{ authorChildComment.getUsername() }}</h5>
+                                        </div>
+                                        <button class="btn dropdown"><i class="ri-more-line"></i></button>
+                                    </div>
+                                    <div class="content">
+                                        {{ childComment.getContent()|raw }}
+                                    </div>
+                                    <div class="footer">
+                                        <span class="is-mute">{% include 'app/post/_partials/_comment_date.html.twig' with {'comment': childComment} %}</span>
+                                    </div>
+                                </div>
+                                {% if loop.last %}
+                                    {% include 'app/post/_partials/_comment_form.html.twig' with {'post': post, 'commentId': comment.getId()} %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
         </div>
     </div>
 {% endblock %}

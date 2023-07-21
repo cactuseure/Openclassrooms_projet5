@@ -6,12 +6,13 @@
   },
   "require": {
     "ext-pdo": "*",
-    "symfony/http-foundation": "^6.3",
-    "symfony/var-dumper": "^5.0",
-    "twig/twig": "^3.6",
-    "tinymce/tinymce" : "*"
+    "symfony/http-foundation": "*",
+    "twig/twig": "*",
+    "tinymce/tinymce" : "*",
+    "vlucas/phpdotenv" : "*",
+    "symfony/twig-bundle": "*"
   },
   "require-dev": {
-    "symfony/twig-bundle": "^6.0"
+    "symfony/var-dumper": "*"
   }
 }
