@@ -49,15 +49,16 @@ $routes = [
     '/forget-password' => [$userController, 'forgetPassword'],
     '/reset-password' => [$userController, 'resetPassword'],
     '/password-reset-requested' => [$userController, 'passwordResetRequested'],
-    '/article' => [$postController, 'show'], // Nouvelle route pour afficher un post
-    '/admin/articles' => [$adminController, 'listPosts'], // Nouvelle route pour afficher un post
-    '/admin/commentaires' => [$adminController, 'listComments'], // Nouvelle route pour afficher un post
-    '/admin/edit-post' => [$adminController, 'editPost'], // Nouvelle route pour afficher un post
-    '/admin/add-post' => [$adminController, 'addPost'], // Nouvelle route pour afficher un post
-    '/admin/remove-post' => [$adminController, 'deletePost'], // Nouvelle route pour afficher un post
-    '/admin/remove-comment' => [$adminController, 'removeComment'], // Nouvelle route pour afficher un post
-    '/admin/toggle-post' => [$adminController, 'swapStatus'], // Nouvelle route pour afficher un post
-    '/admin/approve-comment' => [$adminController, 'approveComment'], // Nouvelle route pour afficher un post
+    '/article' => [$postController, 'show'],
+    '/admin/articles' => [$adminController, 'listPosts'],
+    '/admin/commentaires' => [$adminController, 'listComments'],
+    '/admin/utilisateurs' => [$adminController, 'listUsers'],
+    '/admin/edit-post' => [$adminController, 'editPost'],
+    '/admin/add-post' => [$adminController, 'addPost'],
+    '/admin/remove-post' => [$adminController, 'deletePost'],
+    '/admin/remove-comment' => [$adminController, 'removeComment'],
+    '/admin/toggle-post' => [$adminController, 'swapStatus'],
+    '/admin/approve-comment' => [$adminController, 'approveComment'],
 ];
 
 // Vérifie si l'URL correspond à une route définie
