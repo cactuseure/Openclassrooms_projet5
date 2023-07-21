@@ -1,7 +1,12 @@
 <?php
 namespace App\Controller;
+use App\Entity\Comment;
 use App\Entity\Post;
+use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
+use App\Repository\UserRepository;
+use Exception;
+use http\Client\Curl\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Error\LoaderError;
@@ -10,6 +15,8 @@ use Twig\Error\SyntaxError;
 
 class AdminController extends AbstractController
 {
+
+
     public function __construct()
     {
         parent::__construct();
@@ -121,12 +128,13 @@ class AdminController extends AbstractController
 
     private function isUserLoggedIn(): bool
     {
-        return (isset($_SESSION['user_id']) && $_SESSION['user_id']);
+        return (isset($_SESSION['user']['id']) && $_SESSION['user']['id']);
     }
     private function isUserLoggedInAdmin(): bool
     {
-        return (isset($_SESSION['user_id']) && $_SESSION['user_id']);
+        return (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == 'administrateur');
     }
+
 
     /**
      * @throws SyntaxError
@@ -191,6 +199,141 @@ class AdminController extends AbstractController
         ]);
     }
 
+
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     * @throws Exception
+     */
+    public function listComments(Request $request): Response
+    {
+        $commentRepository = new CommentRepository();
+        $postRepository = new PostRepository();
+        $userRepository = new UserRepository();
+        $comments = array_reverse($commentRepository->getAllComments());
+        $successMessage = $this->getSuccessMessage($request);
+        $errorMessage = $this->getErrorMessage($request);
+        $arrayAuthor = array();
+        /** @var Comment $comment */
+        foreach ($comments as $comment){
+            $arrayAuthor[$comment->getId()] = $userRepository->getUserById($comment->getAuthorId())->getUsername();
+        }
+        $content = $this->twig->render('app/admin/list-comments.html.twig', [
+            'comments' => $comments,
+            'postRepository' => $postRepository,
+            'message_success' => $successMessage,
+            'message_error' => $errorMessage,
+            'arrayAuthor' => $arrayAuthor
+        ]);
+        return new Response($content);
+    }
+
+
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function listUsers(Request $request): Response
+    {
+        $userRepository = new UserRepository();
+        $users = $userRepository->getUsers();
+        $successMessage = $this->getSuccessMessage($request);
+        $errorMessage = $this->getErrorMessage($request);
+        $content = $this->twig->render('app/admin/list-users.html.twig', [
+            'user' => $users,
+            'message_success' => $successMessage,
+            'message_error' => $errorMessage,
+        ]);
+        return new Response($content);
+    }
+
+    public function getSuccessMessage(Request $request): string|null
+    {
+        if ($request->isMethod('GET') && $request->query->has('comment_id')) {
+            return $request->query->get('comment_id');
+        }else{
+            return null;
+        }
+    }
+    public function getErrorMessage(Request $request): string|null
+    {
+        if ($request->isMethod('GET') && $request->query->has('comment_id')) {
+            return $request->query->get('comment_id');
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws LoaderError
+     * @throws Exception
+     */
+    public function removeComment(Request $request): Response
+    {
+        $successMessage = null;
+        $errorMessage = null;
+
+        $commentRepository = new CommentRepository();
+
+        if ($this->isUserLoggedInAdmin() && $request->isMethod('GET') && $request->query->has('comment_id')){
+            $comment_id = $request->query->get('comment_id');
+            if ($commentRepository->deleteComment($comment_id)){
+                $successMessage = 'Commentaires supprimés avec succès';
+            }else{
+                $errorMessage = 'Une erreur est survenue';
+            }
+        }
+
+        $comments = $commentRepository->getAllComments();
+
+        return $this->render('app/admin/list-comments.html.twig', [
+            'comments' => $comments,
+            'message_success' => $successMessage,
+            'message_error' => $errorMessage
+        ]);
+    }
+
+
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     * @throws Exception
+     */
+    public function approveComment(Request $request): Response
+    {
+        $successMessage = null;
+        $errorMessage = null;
+
+        $commentRepository = new CommentRepository();
+
+        if ($this->isUserLoggedInAdmin() && $request->isMethod('GET') && $request->query->has('comment_id')){
+            $comment_id = $request->query->get('comment_id');
+            $comment = $commentRepository->getCommentById($comment_id);
+            $comment->setApproved(!$comment->getStatus());
+            if ($commentRepository->updateComment($comment) && $comment->getStatus()){
+                $successMessage = 'Le commentaire est maintenant visible';
+                return $this->redirectToRoute('/admin/commentaires',['message_success' => $successMessage]);
+            }elseif($commentRepository->updateComment($comment) && !$comment->getStatus()){
+                $successMessage = 'Le commentaire est maintenant invisible';
+                return $this->redirectToRoute('/admin/commentaires',['message_success' => $successMessage]);
+            }else{
+                $errorMessage = 'Une erreur est survenue';
+            }
+        }
+
+        $comments = $commentRepository->getAllComments();
+
+        return $this->render('app/admin/list-comments.html.twig', [
+            'comments' => $comments,
+            'message_success' => $successMessage,
+            'message_error' => $errorMessage
+        ]);
+    }
 
 
 }

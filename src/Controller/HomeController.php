@@ -47,4 +47,27 @@ class HomeController extends AbstractController
         return $this->render('app/home/show.html.twig', ['post' => $post]);
     }
 
+    /**
+     * @param string $slug
+     * @return Response
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    public function contact(): Response
+    {
+        $successMessage = null;
+        $errorMessage = null;
+
+        return $this->render(
+            'app/home/contact.html.twig',
+            [
+                'message_success' => $successMessage,
+                'message_error' => $errorMessage
+            ]
+        );
+    }
+
+
+
 }

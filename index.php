@@ -12,8 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 session_start();
 
-require_once __DIR__ . '/bootstrap.php';
-
 // Créer une instance de Request
 $request = Request::createFromGlobals();
 
@@ -21,10 +19,13 @@ $request = Request::createFromGlobals();
 $url = $request->getPathInfo();
 
 // Instanciation des contrôleurs
-$homeController  = new \App\Controller\HomeController();
-$postController  = new \App\Controller\PostController();
-$userController  = new \App\Controller\UserController();
+$homeController = new \App\Controller\HomeController();
+$postController = new \App\Controller\PostController();
+$userController = new \App\Controller\UserController();
 $adminController = new \App\Controller\AdminController();
+$commentRepository = new \App\Repository\CommentRepository();
+$postRepository = new \App\Repository\PostRepository();
+$commentController = new \App\Controller\CommentController($commentRepository, $postRepository);
 
 // Récupère les données POST et GET
 $postData = $request->request->all();
@@ -37,21 +38,26 @@ $request = $request->duplicate($getData, $postData);
 $routes = [
     '/' => [$homeController, 'index'],
     '/articles' => [$postController, 'index'],
+    '/comment_post' => [$commentController, 'comment_post'],
     '/connexion' => [$userController, 'login'],
     '/inscription' => [$userController, 'register'],
     '/mon-compte' => [$userController, 'account'],
     '/edit-password' => [$userController, 'editPassword'],
     '/edit-profil' => [$userController, 'editProfile'],
     '/deconnexion' => [$userController, 'logout'],
+    '/contact' => [$homeController, 'contact'],
     '/forget-password' => [$userController, 'forgetPassword'],
     '/reset-password' => [$userController, 'resetPassword'],
     '/password-reset-requested' => [$userController, 'passwordResetRequested'],
     '/article' => [$postController, 'show'], // Nouvelle route pour afficher un post
     '/admin/articles' => [$adminController, 'listPosts'], // Nouvelle route pour afficher un post
+    '/admin/commentaires' => [$adminController, 'listComments'], // Nouvelle route pour afficher un post
     '/admin/edit-post' => [$adminController, 'editPost'], // Nouvelle route pour afficher un post
     '/admin/add-post' => [$adminController, 'addPost'], // Nouvelle route pour afficher un post
     '/admin/remove-post' => [$adminController, 'deletePost'], // Nouvelle route pour afficher un post
+    '/admin/remove-comment' => [$adminController, 'removeComment'], // Nouvelle route pour afficher un post
     '/admin/toggle-post' => [$adminController, 'swapStatus'], // Nouvelle route pour afficher un post
+    '/admin/approve-comment' => [$adminController, 'approveComment'], // Nouvelle route pour afficher un post
 ];
 
 // Vérifie si l'URL correspond à une route définie
