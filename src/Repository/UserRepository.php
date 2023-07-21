@@ -181,10 +181,31 @@ class UserRepository
         return $stmt->execute();
     }
 
-    public function getUsers()
+    public function getUsers(): array
     {
-        $stmt = $this->db->query("SELECT * FROM `user`");
-        return $this->getUserByPdo($stmt);
+        $users = [];
+        $query = $this->db->query('SELECT * FROM user');
+        $results = $query->fetchAll();
+        foreach ($results as $result) {
+            if ($result){
+                $createdAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['created_at']);
+                $user = new User(
+                    $result['first_name'],
+                    $result['last_name'],
+                    $result['email'],
+                    $result['username'],
+                    $result['password'],
+                    $createdAt,
+                    $result['reset_token'],
+                    $result['role'],
+                    $result['profile_image'],
+                    $result['id'],
+
+                );
+                $users[] = $user;
+            }
+        }
+        return $users;
     }
 
 }

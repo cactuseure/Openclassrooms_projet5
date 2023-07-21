@@ -241,6 +241,7 @@ class AdminController extends AbstractController
         $users = $userRepository->getUsers();
         $successMessage = $this->getSuccessMessage($request);
         $errorMessage = $this->getErrorMessage($request);
+        dump($users);
         $content = $this->twig->render('app/admin/list-users.html.twig', [
             'user' => $users,
             'message_success' => $successMessage,
