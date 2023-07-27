@@ -18,7 +18,6 @@ $request = Request::createFromGlobals();
 // Obtient l'URL demandée à partir de la requête
 $url = $request->getPathInfo();
 
-// Instanciation des contrôleurs
 $homeController = new \App\Controller\HomeController();
 $postController = new \App\Controller\PostController();
 $userController = new \App\Controller\UserController();
@@ -34,7 +33,6 @@ $getData = $request->query->all();
 // Ajoute les données POST et GET à la requête
 $request = $request->duplicate($getData, $postData);
 
-// Définissez vos routes et associez-les aux contrôleurs correspondants
 $routes = [
     '/' => [$homeController, 'index'],
     '/articles' => [$postController, 'index'],
@@ -49,15 +47,18 @@ $routes = [
     '/forget-password' => [$userController, 'forgetPassword'],
     '/reset-password' => [$userController, 'resetPassword'],
     '/password-reset-requested' => [$userController, 'passwordResetRequested'],
-    '/article' => [$postController, 'show'], // Nouvelle route pour afficher un post
-    '/admin/articles' => [$adminController, 'listPosts'], // Nouvelle route pour afficher un post
-    '/admin/commentaires' => [$adminController, 'listComments'], // Nouvelle route pour afficher un post
-    '/admin/edit-post' => [$adminController, 'editPost'], // Nouvelle route pour afficher un post
-    '/admin/add-post' => [$adminController, 'addPost'], // Nouvelle route pour afficher un post
-    '/admin/remove-post' => [$adminController, 'deletePost'], // Nouvelle route pour afficher un post
-    '/admin/remove-comment' => [$adminController, 'removeComment'], // Nouvelle route pour afficher un post
-    '/admin/toggle-post' => [$adminController, 'swapStatus'], // Nouvelle route pour afficher un post
-    '/admin/approve-comment' => [$adminController, 'approveComment'], // Nouvelle route pour afficher un post
+    '/article' => [$postController, 'show'],
+    '/admin/articles' => [$adminController, 'listPosts'],
+    '/admin/commentaires' => [$adminController, 'listComments'],
+    '/admin/utilisateurs' => [$adminController, 'listUsers'],
+    '/admin/user-toggle-role' => [$adminController, 'swapUserRole'],
+    '/admin/user-toggle-status' => [$adminController, 'swapUserStatus'],
+    '/admin/edit-post' => [$adminController, 'editPost'],
+    '/admin/add-post' => [$adminController, 'addPost'],
+    '/admin/remove-post' => [$adminController, 'deletePost'],
+    '/admin/remove-comment' => [$adminController, 'removeComment'],
+    '/admin/toggle-post' => [$adminController, 'swapStatus'],
+    '/admin/approve-comment' => [$adminController, 'approveComment'],
 ];
 
 // Vérifie si l'URL correspond à une route définie
@@ -70,7 +71,7 @@ if (isset($routes[$url])) {
     // route = /article/slug
     $slug = substr($url, strlen('/article/'));
     try {
-        $response = $postController->show($slug, $request); // Passe la requête en argument
+        $response = $postController->show($slug, $request);
     } catch (\Twig\Error\LoaderError|\Twig\Error\RuntimeError|\Twig\Error\SyntaxError $e) {
         $response = new Response('Internal Server Error', 500);
     }

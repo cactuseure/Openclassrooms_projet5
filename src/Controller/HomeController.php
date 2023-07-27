@@ -40,7 +40,6 @@ class HomeController extends AbstractController
         $post = $this->postRepository->findBySlug($slug);
 
         if (!$post) {
-            // Si l'article n'existe pas, redirect l'utilisateur vers la liste des articles
             return $this->redirectToRoute('articles');
         }
 

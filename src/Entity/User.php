@@ -18,6 +18,7 @@ class User
     private ?string $role = null;
     private ?string $profile_image = null;
     private ?string $reset_token = null;
+    private bool $isActive = true;
 
     public function __construct(
         ?string $firstName = null,
@@ -29,20 +30,18 @@ class User
         ?string $reset_token = null,
         ?string $role = null,
         ?string $profile_image = null,
+        ?bool $isActive = null,
         ?int $id = null,
     )
     {
-        // Vérifier la validité du prénom
         if (empty($firstName)) {
             throw new \InvalidArgumentException('Le prénom ne peut pas être vide.');
         }
 
-        // Vérifier la validité du nom de famille
         if (empty($lastName)) {
             throw new \InvalidArgumentException('Le nom de famille ne peut pas être vide.');
         }
 
-        // Vérifier la validité de l'adresse email
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new \InvalidArgumentException('L\'adresse email n\'est pas valide.');
         }
@@ -51,7 +50,6 @@ class User
             throw new \InvalidArgumentException('Le pseudo n\'est pas valide.');
         }
 
-        // Assigner les valeurs aux propriétés de l'objet User
         if ($id !== null) {
             $this->id = $id;
         }
@@ -69,6 +67,9 @@ class User
         }
         if ($profile_image !== null) {
             $this->profile_image = $profile_image;
+        }
+        if ($isActive !== null) {
+            $this->isActive = $isActive;
         }
     }
 
@@ -145,7 +146,7 @@ class User
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getPassword(): ?string
     {
@@ -251,4 +252,19 @@ class User
         $this->profile_image = $profile_image;
     }
 
+    /**
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    /**
+     * @param bool $isActive
+     */
+    public function setActive(bool $isActive): void
+    {
+        $this->isActive = $isActive;
+    }
 }

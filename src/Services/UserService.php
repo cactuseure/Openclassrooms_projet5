@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Entity\User;
 use App\Repository\UserRepository;
 
-session_start(); // Démarrer la session
+session_start();
 
 class UserService
 {
