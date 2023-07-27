@@ -18,12 +18,15 @@ $request = Request::createFromGlobals();
 // Obtient l'URL demandée à partir de la requête
 $url = $request->getPathInfo();
 
+$commentRepository = new \App\Repository\CommentRepository();
+$postRepository = new \App\Repository\PostRepository();
+$contactMessageRepository = new \App\Repository\ContactMessageRepository();
+
 $homeController = new \App\Controller\HomeController();
 $postController = new \App\Controller\PostController();
 $userController = new \App\Controller\UserController();
 $adminController = new \App\Controller\AdminController();
-$commentRepository = new \App\Repository\CommentRepository();
-$postRepository = new \App\Repository\PostRepository();
+$contactController = new \App\Controller\ContactController($contactMessageRepository);
 $commentController = new \App\Controller\CommentController($commentRepository, $postRepository);
 
 // Récupère les données POST et GET
@@ -43,7 +46,7 @@ $routes = [
     '/edit-password' => [$userController, 'editPassword'],
     '/edit-profil' => [$userController, 'editProfile'],
     '/deconnexion' => [$userController, 'logout'],
-    '/contact' => [$homeController, 'contact'],
+    '/contact' => [$contactController, 'contactForm'],
     '/forget-password' => [$userController, 'forgetPassword'],
     '/reset-password' => [$userController, 'resetPassword'],
     '/password-reset-requested' => [$userController, 'passwordResetRequested'],
