@@ -55,16 +55,7 @@ class HomeController extends AbstractController
      */
     public function contact(): Response
     {
-        $successMessage = null;
-        $errorMessage = null;
 
-        return $this->render(
-            'app/home/contact.html.twig',
-            [
-                'message_success' => $successMessage,
-                'message_error' => $errorMessage
-            ]
-        );
     }
 
 
