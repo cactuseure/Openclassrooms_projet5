@@ -18,7 +18,6 @@ $request = Request::createFromGlobals();
 // Obtient l'URL demandée à partir de la requête
 $url = $request->getPathInfo();
 
-// Instanciation des contrôleurs
 $homeController = new \App\Controller\HomeController();
 $postController = new \App\Controller\PostController();
 $userController = new \App\Controller\UserController();
@@ -34,7 +33,6 @@ $getData = $request->query->all();
 // Ajoute les données POST et GET à la requête
 $request = $request->duplicate($getData, $postData);
 
-// Définissez vos routes et associez-les aux contrôleurs correspondants
 $routes = [
     '/' => [$homeController, 'index'],
     '/articles' => [$postController, 'index'],
@@ -53,6 +51,8 @@ $routes = [
     '/admin/articles' => [$adminController, 'listPosts'],
     '/admin/commentaires' => [$adminController, 'listComments'],
     '/admin/utilisateurs' => [$adminController, 'listUsers'],
+    '/admin/user-toggle-role' => [$adminController, 'swapUserRole'],
+    '/admin/user-toggle-status' => [$adminController, 'swapUserStatus'],
     '/admin/edit-post' => [$adminController, 'editPost'],
     '/admin/add-post' => [$adminController, 'addPost'],
     '/admin/remove-post' => [$adminController, 'deletePost'],
@@ -71,7 +71,7 @@ if (isset($routes[$url])) {
     // route = /article/slug
     $slug = substr($url, strlen('/article/'));
     try {
-        $response = $postController->show($slug, $request); // Passe la requête en argument
+        $response = $postController->show($slug, $request);
     } catch (\Twig\Error\LoaderError|\Twig\Error\RuntimeError|\Twig\Error\SyntaxError $e) {
         $response = new Response('Internal Server Error', 500);
     }

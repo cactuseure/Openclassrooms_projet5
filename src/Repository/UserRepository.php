@@ -147,6 +147,7 @@ class UserRepository
                 $result['reset_token'],
                 $result['role'],
                 $result['profile_image'],
+                $result['is_active'],
                 $result['id'],
             );
 
@@ -171,6 +172,7 @@ class UserRepository
         $stmt->bindValue(':reset_token', $user->getResetToken());
         $stmt->bindValue(':profile_image', $user->getProfileImage());
         $stmt->bindValue(':role', $user->getRole());
+        $stmt->bindValue(':is_active', $user->isActive());
     }
 
     public function changePasswordBy(?int $userId, string $newPassword): bool
@@ -199,6 +201,7 @@ class UserRepository
                     $result['reset_token'],
                     $result['role'],
                     $result['profile_image'],
+                    $result['is_active'],
                     $result['id'],
 
                 );
@@ -206,6 +209,35 @@ class UserRepository
             }
         }
         return $users;
+    }
+
+    public function swapActif(User $user): bool
+    {
+        $newStatus = $user->isActive() ? 0 : 1;
+
+        $db = Db::getInstance();
+        $sql = "UPDATE user SET is_active = :is_active WHERE id = :id";
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':is_active', $newStatus);
+        $stmt->bindValue(':id', $user->getId());
+
+        return $stmt->execute();
+    }
+
+    public function swapRole(User $user): bool
+    {
+        if ($user->getRole() == 'ROLE_ADMIN'){
+            $newRole = 'ROLE_USER';
+        }else{
+            $newRole = 'ROLE_ADMIN';
+        }
+        $db = Db::getInstance();
+        $sql = "UPDATE user SET role = :role WHERE id = :id";
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':role', $newRole);
+        $stmt->bindValue(':id', $user->getId());
+
+        return $stmt->execute();
     }
 
 }

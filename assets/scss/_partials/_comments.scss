@@ -1,6 +1,12 @@
 .block {
 margin: 50px auto 100px;
-
+  a.btn.btn-dark{
+    padding: 3px 12px;
+    background: #1c1c1c;
+    width: fit-content;
+    margin: 0 auto;
+    color: #fff;
+  }
   .tox.tox-tinymce {
     margin-bottom: 15px;
   }
@@ -10,7 +16,9 @@ margin: 50px auto 100px;
     margin-bottom: 17px;
     border-bottom: 1px solid #e8e8e8;
   }
-
+.comment_form{
+  margin-bottom: 30px;
+}
   .btn {
     appearance: none;
     background: transparent;

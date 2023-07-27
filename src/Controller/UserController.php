@@ -60,7 +60,9 @@ class UserController extends AbstractController
                         new DateTimeImmutable(),
                         null,
                         'ROLE_USER',
-                        null);
+                        null,
+                    false
+                    );
 
                     $userRepository->createUser($user);
 
@@ -99,18 +101,22 @@ class UserController extends AbstractController
             } else {
                 $user = $userRepository->getUserByEmail($email);
                 if ($user && password_verify($password, $user->getPassword())) {
-                    $_SESSION['user'] = [
-                        'id' => $user->getId(),
-                        'firstName' => $user->getFirstName(),
-                        'lastName' => $user->getLastName(),
-                        'email' => $user->getEmail(),
-                        'username' => $user->getUsername(),
-                        'role' => $user->getLabelRole(),
-                        'created_at' => $user->getCreatedAt(),
-                        'profile_image' => $user->getProfileImage(),
-                        'is_connected' => true,
-                    ];
-                    return $this->redirectToRoute('mon-compte');
+                    if ($user->isActive()){
+                        $_SESSION['user'] = [
+                            'id' => $user->getId(),
+                            'firstName' => $user->getFirstName(),
+                            'lastName' => $user->getLastName(),
+                            'email' => $user->getEmail(),
+                            'username' => $user->getUsername(),
+                            'role' => $user->getLabelRole(),
+                            'created_at' => $user->getCreatedAt(),
+                            'profile_image' => $user->getProfileImage(),
+                            'is_connected' => true,
+                        ];
+                        return $this->redirectToRoute('mon-compte');
+                    }else{
+                        $error = 'Compte pas encore validé';
+                    }
                 } else {
                     $error = 'Identifiants invalides';
                 }
@@ -156,7 +162,7 @@ class UserController extends AbstractController
             if (empty($firstName) || empty($lastName) || empty($email) || empty($username)) {
                 $error = 'Veuillez remplir tous les champs du formulaire.';
             } else {
-                // Vérifie si l'utilisateur existe déjà dans la base de données
+                // Vérifie si l'utilisateur existe déjà dans la bdd
                 $userRepository = new UserRepository();
 
                 $existingUserMail = $userRepository->isEmailTaken($email, true);
@@ -167,7 +173,6 @@ class UserController extends AbstractController
                 } elseif ($existingUserName) {
                     $error = 'Un compte avec cet username existe déjà.';
                 } else {
-                    // Créer un nouvel utilisateur
                     $user = new User($firstName, $lastName, $email, $username);
                     try {
                         $userRepository->updateUser($user);
@@ -182,7 +187,6 @@ class UserController extends AbstractController
                 }
             }
         }
-        // Affiche le formulaire de modification du profil
         return $this->render('/app/user/edit-profil.html.twig',
             [
                 'error' => $error,

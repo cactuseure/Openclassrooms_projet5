@@ -70,7 +70,6 @@ class PostRepository
         $stmt->bindValue(':updated_at', $post->getUpdatedAt()->format('Y-m-d H:i:s'));
         $stmt->bindValue(':is_active', $post->isActive());
         $stmt->bindValue(':author_id', $post->getAuthorId());
-        $stmt->bindValue(':category_id', $post->getCategoryId());
 
         $stmt->execute();
     }
@@ -86,12 +85,9 @@ class PostRepository
                     content = :content,
                     updated_at = :updated_at,
                     is_active = :is_active,
-                    author_id = :author_id,
-                    category_id = :category_id
+                    author_id = :author_id
                 WHERE id = :id";
-
         $stmt = $db->prepare($sql);
-
         $stmt->bindValue(':title', $post->getTitle());
         $stmt->bindValue(':slug', $post->getSlug());
         $stmt->bindValue(':thumbnail', $post->getThumbnail());
@@ -100,7 +96,6 @@ class PostRepository
         $stmt->bindValue(':updated_at', $post->getUpdatedAt()->format('Y-m-d H:i:s'));
         $stmt->bindValue(':is_active', $post->isActive());
         $stmt->bindValue(':author_id', $post->getAuthorId());
-        $stmt->bindValue(':category_id', $post->getCategoryId());
         $stmt->bindValue(':id', $post->getId());
 
         return $stmt->execute();
@@ -152,7 +147,7 @@ class PostRepository
     {
         $createdAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['created_at']);
         $updatedAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['updated_at']);
-        return new Post($result['title'], $result['slug'], $result['thumbnail'], $result['hat'], $result['content'], $createdAt, $updatedAt,$result['is_active'], $result['author_id'], $result['category_id'], $result['id']);
+        return new Post($result['title'], $result['slug'], $result['thumbnail'], $result['hat'], $result['content'], $createdAt, $updatedAt,$result['is_active'], $result['author_id'], $result['id']);
     }
 
     function generateSlug(string $title): string
