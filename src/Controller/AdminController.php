@@ -64,7 +64,7 @@ class AdminController extends AbstractController
                     } elseif ($postRepository->isSlugIsTaken($slug,true)){
                         $errorMessage = 'Un article possède deja ce titre';
                     }else{
-                        $updated_post = new Post($title,$post->getSlug(),$post->getThumbnail(),$hat,$content,$post->getCreatedAt(),new \DateTimeImmutable(),$post->isActive(),$post->getAuthorId(),$post->getCategoryId(),$post->getId());
+                        $updated_post = new Post($title,$post->getSlug(),$post->getThumbnail(),$hat,$content,$post->getCreatedAt(),new \DateTimeImmutable(),$post->isActive(),$post->getAuthorId(),$post->getId());
 
                         $postRepository->updatePost($updated_post);
                         $successMessage = 'Article modifié avec succès';
@@ -112,7 +112,6 @@ class AdminController extends AbstractController
                 $post->setHat($hat);
                 $post->setContent($content);
                 $post->setAuthorId(9);
-                $post->setCategoryId(1);
                 $post->setCreatedAt(new \DateTimeImmutable());
                 $post->setUpdatedAt(new \DateTimeImmutable());
                 $post->setIsActive(true);
@@ -241,9 +240,72 @@ class AdminController extends AbstractController
         $users = $userRepository->getUsers();
         $successMessage = $this->getSuccessMessage($request);
         $errorMessage = $this->getErrorMessage($request);
-        dump($users);
         $content = $this->twig->render('app/admin/list-users.html.twig', [
-            'user' => $users,
+            'users' => $users,
+            'message_success' => $successMessage,
+            'message_error' => $errorMessage,
+        ]);
+        return new Response($content);
+    }
+
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function swapUserRole(Request $request): Response
+    {
+        $successMessage = null;
+        $errorMessage = null;
+        $userRepository = new UserRepository();
+        if (isset($_GET['user_id']) && $_GET['user_id'] != null){
+            $user = $userRepository->getUserById($_GET['user_id']);
+            if ($user){
+                if (!$userRepository->swapRole($user)) {
+                    $errorMessage = 'Erreur lors du changement d\'état';
+                }
+            }else{
+                $errorMessage = 'Article introuvable';
+            }
+        }else{
+            $errorMessage = 'Article introuvable';
+        }
+
+        $users = $userRepository->getUsers();
+        $content = $this->twig->render('app/admin/list-users.html.twig', [
+            'users' => $users,
+            'message_success' => $successMessage,
+            'message_error' => $errorMessage,
+        ]);
+        return new Response($content);
+    }
+
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function swapUserStatus(Request $request): Response
+    {
+        $successMessage = null;
+        $errorMessage = null;
+        $userRepository = new UserRepository();
+        if (isset($_GET['user_id']) && $_GET['user_id'] != null){
+            $user = $userRepository->getUserById($_GET['user_id']);
+            if ($user){
+                if (!$userRepository->swapActif($user)) {
+                    $errorMessage = 'Erreur lors du changement d\'état';
+                }
+            }else{
+                $errorMessage = 'User introuvable';
+            }
+        }else{
+            $errorMessage = 'User introuvable';
+        }
+
+        $users = $userRepository->getUsers();
+        $content = $this->twig->render('app/admin/list-users.html.twig', [
+            'users' => $users,
             'message_success' => $successMessage,
             'message_error' => $errorMessage,
         ]);

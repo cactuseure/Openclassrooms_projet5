@@ -56,6 +56,15 @@ header > nav {
   font-family: "Poppins", sans-serif;
   text-align: center;
   width: 100%;
+  font-size: 2rem;
+  line-height: 3rem;
+}
+.post h2 p {
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+  width: 100%;
+  font-size: 2rem;
+  line-height: 3rem;
 }
 
 .gradient-custom {
@@ -74,6 +83,9 @@ body main > .container {
 main.admin table {
   width: 100%;
 }
+main.admin table p {
+  margin: 0;
+}
 main.admin table td.title svg {
   width: 20px;
   position: relative;
@@ -88,6 +100,13 @@ main.admin table td.actions {
 main.admin table td.actions svg {
   display: block;
   width: 25px;
+}
+main.admin table .user_role {
+  display: flex;
+  gap: 10px;
+}
+main.admin table .user_role svg {
+  width: 24px;
 }
 main.admin form {
   padding: 30px;
@@ -132,6 +151,13 @@ main.admin .container div.row .col-lg-9 {
   border-radius: 8px;
   display: block;
 }
+.block a.btn.btn-dark {
+  padding: 3px 12px;
+  background: #1c1c1c;
+  width: fit-content;
+  margin: 0 auto;
+  color: #fff;
+}
 .block .tox.tox-tinymce {
   margin-bottom: 15px;
 }
@@ -139,6 +165,9 @@ main.admin .container div.row .col-lg-9 {
   padding-bottom: 12px;
   margin-bottom: 17px;
   border-bottom: 1px solid #e8e8e8;
+}
+.block .comment_form {
+  margin-bottom: 30px;
 }
 .block .btn {
   appearance: none;

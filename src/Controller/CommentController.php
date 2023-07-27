@@ -38,26 +38,19 @@ class CommentController extends AbstractController
         $postId = $request->query->get('post_id');
         $commentId = $request->query->get('comment_id');
         $content = $request->request->get('comment_'.$commentId);
-        $author = $this->getCurrentUser(); // Méthode pour obtenir l'auteur du commentaire connecté
-        // Vérifier si le formulaire a été soumis et si le contenu du commentaire est non vide
-
-
+        $author = $this->getCurrentUser();
 
         if ($request->isMethod('POST') && !empty($content)) {
-            // Récupérer le post correspondant au slug
             $post = $this->postRepository->getPostById($postId);
 
-            // Vérifier si le post existe
             if (!$post) {
                 return new Response('Post not found', Response::HTTP_NOT_FOUND);
             }
 
-            // Vérifier si le commentaire a un parent ou s'il est un nouveau commentaire
             if ($commentId === 'new') {
-                $commentId = null; // Commentaire sans parent
+                $commentId = null;
             }
 
-            // Créer un nouveau commentaire
             $comment = new Comment(
                 null,
                 $content,
@@ -72,17 +65,9 @@ class CommentController extends AbstractController
                 $comment->setParentId(null);
             }
 
-            // Enregistrer le commentaire en base de données
             $this->commentRepository->createComment($comment);
-
-            // Rediriger vers la page du post avec un message de succès
             $successMessage = 'Commentaire enregistré (il sera visible après validation)';
-
-
-            // Récupérer les commentaires mis à jour
             $comments = $this->commentRepository->getCommentsByPostId($post->getId());
-
-            // Rendre le template avec les données
             $content = $this->twig->render('app/post/show.html.twig', [
                 'post' => $post,
                 'comments' => $comments,
@@ -94,23 +79,12 @@ class CommentController extends AbstractController
 
             return new Response($content);
         }
-
-        // Rediriger vers la page du post avec un message d'erreur
         $errorMessage = 'Error: Unable to post the comment.';
-
-
-        // Récupérer le post correspondant au slug
         $post = $this->postRepository->getPostById($postId);
-
-        // Vérifier si le post existe
         if (!$post) {
             return new Response('Post not found', Response::HTTP_NOT_FOUND);
         }
-
-        // Récupérer les commentaires
         $comments = $this->commentRepository->getCommentsByPostId($post->getId());
-
-        // Rendre le template avec les données
         $content = $this->twig->render('app/post/show.html.twig', [
             'post' => $post,
             'comments' => $comments,
@@ -119,12 +93,8 @@ class CommentController extends AbstractController
             'userRepository' => $userRepository,
             'commentRepository' => $commentRepository
         ]);
-
         return new Response($content);
     }
-
-
-
 
     public function getCurrentUser(): int
     {

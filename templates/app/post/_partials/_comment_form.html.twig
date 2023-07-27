@@ -1,6 +1,6 @@
 {% block javascripts %}
     <script>
-        {% if commentId == null %}
+        {% if commentId is null %}
         tinymce.init({
             selector: '#comment_0',
             height: 200,
@@ -26,21 +26,26 @@
         });
         {% endif %}
     </script>
-
 {% endblock %}
 
-{% if session.user.is_connected %}
-    {% if commentId == null %}
-        <form action="/comment_post?post_id={{ post.id }}&comment_id=0" method="POST" class="show">
-        <textarea name="comment_0" id="comment_0" rows="2"></textarea>
+{% if commentId is null %}
+<div id="div_comment_0" class="comment_form">
     {% else %}
-        <form id="form_comment_{{ commentId }}" action="/comment_post?post_id={{ post.id }}&comment_id={{ commentId }}" method="POST">
-        <textarea name="comment_{{ commentId }}" id="comment_{{ commentId }}" rows="2"></textarea>
-    {% endif %}
+    <div id="div_comment_{{ commentId }}" class="comment_form" hidden>
+        {% endif %}
+        {% if session.user.is_connected %}
+        {% if commentId is null %}
+        <form action="/comment_post?post_id={{ post.id }}&comment_id=0" method="POST" class="show">
+            <textarea name="comment_0" id="comment_0" rows="2"></textarea>
+            {% else %}
+            <form id="form_comment_{{ commentId }}" action="/comment_post?post_id={{ post.id }}&comment_id={{ commentId }}" method="POST">
+                <textarea name="comment_{{ commentId }}" id="comment_{{ commentId }}" rows="2"></textarea>
+                {% endif %}
 
-        <button class="btn primary" type="submit">Envoyer</button>
-    </form>
-{% else %}
-    <p>Connectez-vous pour commenter cet article.</p>
-    <a href="/connexion">Se connecter</a>
-{% endif %}
+                <button class="btn primary" type="submit">Envoyer</button>
+            </form>
+            {% else %}
+                <p>Connectez-vous pour commenter cet article.</p>
+                <a class="btn btn-dark" href="/connexion">Se connecter</a>
+            {% endif %}
+    </div>

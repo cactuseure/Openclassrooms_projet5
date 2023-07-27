@@ -17,7 +17,6 @@ class Post
     private ?DateTimeImmutable $updatedAt = null;
     private ?bool $isActive = null;
     private ?int $authorId = null;
-    private ?int $categoryId = null;
 
     public function __construct(
         ?string $title = null,
@@ -29,7 +28,6 @@ class Post
         ?DateTimeImmutable $updatedAt = null,
         ?bool $isActive = null,
         ?int $authorId = null,
-        ?int $categoryId = null,
         ?int $id = null,
     )
     {
@@ -59,9 +57,6 @@ class Post
         }
         if ($authorId !== null) {
             $this->authorId = $authorId;
-        }
-        if ($categoryId !== null) {
-            $this->categoryId = $categoryId;
         }
         if ($id !== null) {
             $this->id = $id;
