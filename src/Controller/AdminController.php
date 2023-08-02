@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Controller;
+
 use App\Entity\Comment;
 use App\Entity\Post;
 use App\Repository\CommentRepository;
@@ -46,33 +48,33 @@ class AdminController extends AbstractController
         $errorMessage = null;
         $post = null;
 
-        if ($request->query->has('post_id')){
+        if ($request->query->has('post_id') === TRUE) {
             $postRepository = new PostRepository();
             $postId = $request->query->get('post_id');
             $post = $postRepository->getPostById($postId);
-            if ($post!==null){
-                if ($request->isMethod('POST')) {
+            if ($post !== null) {
+                if ($request->isMethod('POST') === TRUE) {
                     $title = $request->request->get('title');
                     $slug = $postRepository->generateSlug($title);
                     $hat = $request->request->get('hat');
                     $thumbnail = $request->request->get('thumbnail');
                     $content = $request->request->get('content');
-                    if (empty($title) || empty($hat) || empty($content)|| empty($slug)|| empty($thumbnail)){
+                    if (empty($title) || empty($hat) || empty($content) || empty($slug) || empty($thumbnail)) {
                         $errorMessage = 'veuillez remplir tous les champs';
-                    } elseif ($postRepository->isSlugIsTaken($slug,true)){
+                    } elseif ($postRepository->isSlugIsTaken($slug, true)) {
                         $errorMessage = 'Un article possède deja ce titre';
-                    }else{
-                        $updated_post = new Post($title,$post->getSlug(),$thumbnail,$hat,$content,$post->getCreatedAt(),new \DateTimeImmutable(),$post->isActive(),$post->getAuthorId(),$post->getId());
+                    } else {
+                        $updated_post = new Post($title, $post->getSlug(), $thumbnail, $hat, $content, $post->getCreatedAt(), new \DateTimeImmutable(), $post->isActive(), $post->getAuthorId(), $post->getId());
 
                         $postRepository->updatePost($updated_post);
                         $successMessage = 'Article modifié avec succès';
                         $post = $updated_post;
                     }
                 }
-            }else{
+            } else {
                 $errorMessage = 'article introuvable';
             }
-        }else{
+        } else {
             $errorMessage = 'article introuvable';
         }
         return $this->render('/app/admin/edit-post.html.twig', [
@@ -100,7 +102,7 @@ class AdminController extends AbstractController
             $slug = $postRepository->generateSlug($title);
             if (empty($title) || empty($hat) || empty($content) || empty($thumbnail)) {
                 $errorMessage = 'Veuillez remplir tous les champs du formulaire.';
-            } elseif ($postRepository->isSlugIsTaken($slug)){
+            } elseif ($postRepository->isSlugIsTaken($slug)) {
                 $errorMessage = 'Ce titre d\'article est déjà utilisé';
             } else {
                 $post = new Post();
@@ -123,10 +125,6 @@ class AdminController extends AbstractController
         ]);
     }
 
-    private function isUserLoggedIn(): bool
-    {
-        return (isset($_SESSION['user']['id']) && $_SESSION['user']['id']);
-    }
     private function isUserLoggedInAdmin(): bool
     {
         return (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == 'administrateur');
@@ -143,12 +141,12 @@ class AdminController extends AbstractController
         $successMessage = null;
         $errorMessage = null;
         $postRepository = new PostRepository();
-        if (isset($_GET['post_id']) && $_GET['post_id'] != null){
+        if (isset($_GET['post_id']) && $_GET['post_id'] != null) {
             $post = $postRepository->getPostById($_GET['post_id']);
-            if ($post){
+            if ($post) {
                 if ($postRepository->deletePost($_GET['post_id'])) {
                     $successMessage = 'Article : "' . $post->getTitle() . '" a été supprimé avec succès.';
-                }else {
+                } else {
                     $errorMessage = ' Erreur lors de la suppression';
                 }
             }
@@ -173,17 +171,17 @@ class AdminController extends AbstractController
         $successMessage = null;
         $errorMessage = null;
         $postRepository = new PostRepository();
-        if (isset($_GET['post_id']) && $_GET['post_id'] != null){
+        if (isset($_GET['post_id']) && $_GET['post_id'] != null) {
             $post = $postRepository->getPostById($_GET['post_id']);
-            if ($post){
+            if ($post) {
                 if (!$postRepository->swapStatus($_GET['post_id'])) {
                     $errorMessage = 'Erreur lors du changement d\'état';
                 }
 
-            }else{
+            } else {
                 $errorMessage = 'Article introuvable';
             }
-        }else{
+        } else {
             $errorMessage = 'Article introuvable';
         }
 
@@ -213,7 +211,7 @@ class AdminController extends AbstractController
         $errorMessage = $this->getErrorMessage($request);
         $arrayAuthor = array();
         /** @var Comment $comment */
-        foreach ($comments as $comment){
+        foreach ($comments as $comment) {
             $arrayAuthor[$comment->getId()] = $userRepository->getUserById($comment->getAuthorId())->getUsername();
         }
         $content = $this->twig->render('app/admin/list-comments.html.twig', [
@@ -256,16 +254,16 @@ class AdminController extends AbstractController
         $successMessage = null;
         $errorMessage = null;
         $userRepository = new UserRepository();
-        if (isset($_GET['user_id']) && $_GET['user_id'] != null){
+        if (isset($_GET['user_id']) && $_GET['user_id'] != null) {
             $user = $userRepository->getUserById($_GET['user_id']);
-            if ($user){
+            if ($user) {
                 if (!$userRepository->swapRole($user)) {
                     $errorMessage = 'Erreur lors du changement d\'état';
                 }
-            }else{
+            } else {
                 $errorMessage = 'Article introuvable';
             }
-        }else{
+        } else {
             $errorMessage = 'Article introuvable';
         }
 
@@ -288,16 +286,16 @@ class AdminController extends AbstractController
         $successMessage = null;
         $errorMessage = null;
         $userRepository = new UserRepository();
-        if (isset($_GET['user_id']) && $_GET['user_id'] != null){
+        if (isset($_GET['user_id']) && $_GET['user_id'] != null) {
             $user = $userRepository->getUserById($_GET['user_id']);
-            if ($user){
+            if ($user) {
                 if (!$userRepository->swapActif($user)) {
                     $errorMessage = 'Erreur lors du changement d\'état';
                 }
-            }else{
+            } else {
                 $errorMessage = 'User introuvable';
             }
-        }else{
+        } else {
             $errorMessage = 'User introuvable';
         }
 
@@ -314,15 +312,16 @@ class AdminController extends AbstractController
     {
         if ($request->isMethod('GET') && $request->query->has('comment_id')) {
             return $request->query->get('comment_id');
-        }else{
+        } else {
             return null;
         }
     }
+
     public function getErrorMessage(Request $request): string|null
     {
         if ($request->isMethod('GET') && $request->query->has('comment_id')) {
             return $request->query->get('comment_id');
-        }else{
+        } else {
             return null;
         }
     }
@@ -340,11 +339,11 @@ class AdminController extends AbstractController
 
         $commentRepository = new CommentRepository();
 
-        if ($this->isUserLoggedInAdmin() && $request->isMethod('GET') && $request->query->has('comment_id')){
+        if ($this->isUserLoggedInAdmin() && $request->isMethod('GET') && $request->query->has('comment_id')) {
             $comment_id = $request->query->get('comment_id');
-            if ($commentRepository->deleteComment($comment_id)){
+            if ($commentRepository->deleteComment($comment_id)) {
                 $successMessage = 'Commentaires supprimés avec succès';
-            }else{
+            } else {
                 $errorMessage = 'Une erreur est survenue';
             }
         }
@@ -372,17 +371,17 @@ class AdminController extends AbstractController
 
         $commentRepository = new CommentRepository();
 
-        if ($this->isUserLoggedInAdmin() && $request->isMethod('GET') && $request->query->has('comment_id')){
+        if ($this->isUserLoggedInAdmin() && $request->isMethod('GET') && $request->query->has('comment_id')) {
             $comment_id = $request->query->get('comment_id');
             $comment = $commentRepository->getCommentById($comment_id);
             $comment->setApproved(!$comment->getStatus());
-            if ($commentRepository->updateComment($comment) && $comment->getStatus()){
+            if ($commentRepository->updateComment($comment) && $comment->getStatus()) {
                 $successMessage = 'Le commentaire est maintenant visible';
-                return $this->redirectToRoute('/admin/commentaires',['message_success' => $successMessage]);
-            }elseif($commentRepository->updateComment($comment) && !$comment->getStatus()){
+                return $this->redirectToRoute('/admin/commentaires', ['message_success' => $successMessage]);
+            } elseif ($commentRepository->updateComment($comment) && !$comment->getStatus()) {
                 $successMessage = 'Le commentaire est maintenant invisible';
-                return $this->redirectToRoute('/admin/commentaires',['message_success' => $successMessage]);
-            }else{
+                return $this->redirectToRoute('/admin/commentaires', ['message_success' => $successMessage]);
+            } else {
                 $errorMessage = 'Une erreur est survenue';
             }
         }

@@ -38,7 +38,7 @@ class CommentController extends AbstractController
         $postId = $request->query->get('post_id');
         $commentId = $request->query->get('comment_id');
         $content = $request->request->get('comment_'.$commentId);
-        $author = $this->getCurrentUser($request);
+        $author = $this->getCurrentUser();
 
         if ($request->isMethod('POST') && !empty($content)) {
             $post = $this->postRepository->getPostById($postId);
@@ -96,7 +96,7 @@ class CommentController extends AbstractController
         return new Response($content);
     }
 
-    public function getCurrentUser(Request $request): int
+    public function getCurrentUser(): int
     {
         if (isset($_SESSION['user']['id'])) {
             return $_SESSION['user']['id'];
