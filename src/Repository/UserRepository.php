@@ -18,10 +18,8 @@ class UserRepository
     public function createUser(User $user): bool
     {
         try {
-            $stmt = $this->db->prepare('INSERT INTO user (first_name, last_name, email, username, password, reset_token, profile_image , role, created_at) VALUES (:first_name, :last_name, :email, :username, :password, :reset_token, :profile_image, :role, :created_at)');
+            $stmt = $this->db->prepare('INSERT INTO user (first_name, last_name, email, username, password, reset_token, role, created_at,is_active) VALUES (:first_name, :last_name, :email, :username, :password, :reset_token, :role, :created_at, :is_active)');
             $this->bindAllValue($stmt, $user);
-            $stmt->bindValue(':created_at', $user->getCreatedAt()->format('Y-m-d H:i:s'));
-
             return $stmt->execute();
         } catch (\PDOException $e) {
             throw new \PDOException("Erreur lors de la création de l'utilisateur : " . $e->getMessage());
@@ -93,30 +91,12 @@ class UserRepository
         return false;
     }
 
-    public function updateUserProfileImage(int $userId, string $filename): bool
-    {
-        try {
-            $stmt = $this->db->prepare('UPDATE user SET profile_image = :filename WHERE id = :userId');
-            $stmt->bindValue(':filename', $filename);
-            $stmt->bindValue(':userId', $userId);
-
-            return $stmt->execute();
-        } catch (\PDOException $e) {
-            throw new \PDOException("Erreur lors de la mise à jour de l'image de profil de l'utilisateur : " . $e->getMessage());
-        }
-    }
-
     public function updateUser(User $user): ?bool
     {
         try {
-            $stmt = $this->db->prepare('UPDATE user SET first_name = :first_name, last_name = :last_name, email = :email, username = :username, password = :password, reset_token = :reset_token, profile_image = :profile_image, role = :role WHERE id = :user_id');
+            $stmt = $this->db->prepare('UPDATE user SET first_name = :first_name, last_name = :last_name, email = :email, username = :username, password = :password, reset_token = :reset_token, role = :role, created_at = :created_at, is_active = :is_active WHERE id = :user_id');
             $this->bindAllValue($stmt, $user);
-            $stmt->bindValue(':user_id', $_SESSION['user']['id']);
-            $_SESSION['user']['firstName'] = $user->getFirstName();
-            $_SESSION['user']['lastName'] = $user->getLastName();
-            $_SESSION['user']['email'] = $user->getEmail();
-            $_SESSION['user']['username'] = $user->getUsername();
-            $_SESSION['user']['role'] = $user->getRole();
+            $stmt->bindValue(':user_id', $user->getId());
             return $stmt->execute();
         } catch (\PDOException $e) {
             throw new \PDOException("Erreur lors de la mise à jour de l'utilisateur : " . $e->getMessage());
@@ -146,7 +126,6 @@ class UserRepository
                 $createdAt,
                 $result['reset_token'],
                 $result['role'],
-                $result['profile_image'],
                 $result['is_active'],
                 $result['id'],
             );
@@ -170,9 +149,9 @@ class UserRepository
         $stmt->bindValue(':username', $user->getUsername());
         $stmt->bindValue(':password', $user->getPassword());
         $stmt->bindValue(':reset_token', $user->getResetToken());
-        $stmt->bindValue(':profile_image', $user->getProfileImage());
         $stmt->bindValue(':role', $user->getRole());
         $stmt->bindValue(':is_active', $user->isActive());
+        $stmt->bindValue(':created_at', $user->getCreatedAt()->format('Y-m-d H:i:s'));
     }
 
     public function changePasswordBy(?int $userId, string $newPassword): bool
@@ -200,7 +179,6 @@ class UserRepository
                     $createdAt,
                     $result['reset_token'],
                     $result['role'],
-                    $result['profile_image'],
                     $result['is_active'],
                     $result['id'],
 
