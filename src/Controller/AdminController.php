@@ -6,7 +6,6 @@ use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
 use App\Repository\UserRepository;
 use Exception;
-use http\Client\Curl\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Error\LoaderError;
@@ -15,8 +14,6 @@ use Twig\Error\SyntaxError;
 
 class AdminController extends AbstractController
 {
-
-
     public function __construct()
     {
         parent::__construct();
@@ -43,28 +40,29 @@ class AdminController extends AbstractController
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function editPost(): Response
+    public function editPost(Request $request): Response
     {
         $successMessage = null;
         $errorMessage = null;
         $post = null;
 
-        if (isset($_GET['post_id'])){
+        if ($request->query->has('post_id')){
             $postRepository = new PostRepository();
-            $postId = $_GET['post_id'];
+            $postId = $request->query->get('post_id');
             $post = $postRepository->getPostById($postId);
             if ($post!==null){
-                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $title = $_POST['title'];
+                if ($request->isMethod('POST')) {
+                    $title = $request->request->get('title');
                     $slug = $postRepository->generateSlug($title);
-                    $hat = $_POST['hat'];
-                    $content = $_POST['content'];
-                    if (empty($title) || empty($hat) || empty($content)|| empty($slug)){
+                    $hat = $request->request->get('hat');
+                    $thumbnail = $request->request->get('thumbnail');
+                    $content = $request->request->get('content');
+                    if (empty($title) || empty($hat) || empty($content)|| empty($slug)|| empty($thumbnail)){
                         $errorMessage = 'veuillez remplir tous les champs';
                     } elseif ($postRepository->isSlugIsTaken($slug,true)){
                         $errorMessage = 'Un article possède deja ce titre';
                     }else{
-                        $updated_post = new Post($title,$post->getSlug(),$post->getThumbnail(),$hat,$content,$post->getCreatedAt(),new \DateTimeImmutable(),$post->isActive(),$post->getAuthorId(),$post->getId());
+                        $updated_post = new Post($title,$post->getSlug(),$thumbnail,$hat,$content,$post->getCreatedAt(),new \DateTimeImmutable(),$post->isActive(),$post->getAuthorId(),$post->getId());
 
                         $postRepository->updatePost($updated_post);
                         $successMessage = 'Article modifié avec succès';
