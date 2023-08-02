@@ -20,6 +20,7 @@
             <th>Date de création</th>
             <th>Role</th>
             <th>Actif</th>
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -46,16 +47,26 @@
                     </a>
                 </td>
                 <td>
-                    <a href="/admin/user-toggle-status?user_id={{ user.getId() }}">
                     {% if user.isActive() %}
+                        oui
+                    {% else %}
+                        non
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/admin/user-toggle-status?user_id={{ user.getId() }}">
+                        {% if user.isActive() %}
+                            <a href="/admin/user-toggle-status?user_id={{ user.getId() }}" class="btn btn-dark">désactiver</a>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="25px" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
-                    {% else %}
+                        {% else %}
+                            <a href="/admin/user-toggle-status?user_id={{ user.getId() }}" class="btn btn-dark">activer</a>
+
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="25px" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                             </svg>
-                    {% endif %}
+                        {% endif %}
                     </a>
                 </td>
             </tr>

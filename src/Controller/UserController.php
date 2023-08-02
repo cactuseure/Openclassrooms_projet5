@@ -21,7 +21,8 @@ class UserController extends AbstractController
      */
     public function register(): Response
     {
-        $error = null;
+        $successMessage = null;
+        $errorMessage = null;
         $firstName = '';
         $lastName = '';
         $email = '';
@@ -36,20 +37,20 @@ class UserController extends AbstractController
             $confirmPassword = $_POST['confirm_password'] ?? '';
 
             if (empty($firstName) || empty($lastName) || empty($email) || empty($username) || empty($password) || empty($confirmPassword)) {
-                $error = 'Veuillez remplir tous les champs du formulaire.';
+                $errorMessage = 'Veuillez remplir tous les champs du formulaire.';
             } elseif ($password !== $confirmPassword) {
-                $error = 'Les mots de passe ne correspondent pas.';
+                $errorMessage = 'Les mots de passe ne correspondent pas.';
             } elseif (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password)) {
-                $error = 'Le mot de passe doit contenir au moins 8 caractères avec au moins une majuscule et une minuscule.';
+                $errorMessage = 'Le mot de passe doit contenir au moins 8 caractères avec au moins une majuscule et une minuscule.';
             } else {
                 $userRepository = new UserRepository();
 
                 $existingUserMail = $userRepository->isEmailTaken($email);
                 $existingUserName = $userRepository->isUsernameTaken($username);
                 if ($existingUserMail) {
-                    $error = 'Un compte avec cet e-mail existe déjà.';
+                    $errorMessage = 'Un compte avec cet e-mail existe déjà.';
                 } elseif ($existingUserName) {
-                    $error = 'Un compte avec cet username existe déjà.';
+                    $errorMessage = 'Un compte avec cet username existe déjà.';
                 } else {
                     $user = new User(
                         $firstName,
@@ -60,20 +61,18 @@ class UserController extends AbstractController
                         new DateTimeImmutable(),
                         null,
                         'ROLE_USER',
-                        null,
-                    false
+                        false
                     );
-
                     $userRepository->createUser($user);
-
-                    return $this->redirectToRoute('');
+                    $successMessage = 'Inscription enregistré, en attende de validation';
                 }
             }
         }
 
         return $this->render('/app/user/registration.html.twig',
             [
-                'error' => $error,
+                'message_success' => $successMessage,
+                'message_error' => $errorMessage,
                 'first_name' => $firstName,
                 'last_name' => $lastName,
                 'email' => $email,
@@ -110,7 +109,6 @@ class UserController extends AbstractController
                             'username' => $user->getUsername(),
                             'role' => $user->getLabelRole(),
                             'created_at' => $user->getCreatedAt(),
-                            'profile_image' => $user->getProfileImage(),
                             'is_connected' => true,
                         ];
                         return $this->redirectToRoute('mon-compte');
@@ -173,12 +171,24 @@ class UserController extends AbstractController
                 } elseif ($existingUserName) {
                     $error = 'Un compte avec cet username existe déjà.';
                 } else {
-                    $user = new User($firstName, $lastName, $email, $username);
+                    $user = $userRepository->getUserById($_SESSION['user']['id']);
+
+                    $newUser = new User($firstName, $lastName, $email, $username,$user->getPassword(),$user->getCreatedAt(),$user->getResetToken(),$user->getRole(),$user->isActive(),$user->getId());
                     try {
-                        $userRepository->updateUser($user);
+                        $userRepository->updateUser($newUser);
                     } catch (\PDOException $e) {
                         throw new \PDOException("Erreur lors de la mise à jour de l'utilisateur : " . $e->getMessage());
                     }
+                    $_SESSION['user'] = [
+                        'id' => $newUser->getId(),
+                        'firstName' => $newUser->getFirstName(),
+                        'lastName' => $newUser->getLastName(),
+                        'email' => $newUser->getEmail(),
+                        'username' => $newUser->getUsername(),
+                        'role' => $newUser->getLabelRole(),
+                        'created_at' => $newUser->getCreatedAt(),
+                        'is_connected' => true,
+                    ];
                     return $this->redirectToRoute('mon-compte',
                         [
                             'message-edit' => 'success'

@@ -40,31 +40,15 @@
                         <input type="password" id="confirm_password" name="confirm_password" class="form-control"
                                required>
                     </div>
-                    <div class="form-group">
-                        <label for="profile_image">Image de profil<span style="color: red;">*</span></label>
-                        <input type="file" id="profile_image" name="profile_image" class="form-control" accept="image/*"
-                               required>
-                        <div id="image_preview"></div>
-                    </div>
-                    {% if error is not null %}
-                        <div class="alert alert-danger">{{ error }}</div>
+                    {% if message_success %}
+                        <div class="alert alert-success">{{ message_success }}</div>
+                    {% endif %}
+                    {% if message_error %}
+                        <div class="alert alert-danger">{{ message_error }}</div>
                     {% endif %}
                     <button type="submit" class="btn btn-primary">S'inscrire</button>
                 </form>
             </div>
         </div>
     </div>
-    <script>
-        // Aperçu de l'image en direct
-        function previewImage(event) {
-            let reader = new FileReader();
-            reader.onload = function () {
-                let output = document.getElementById('image_preview');
-                output.innerHTML = '<img src="' + reader.result + '" width="200">';
-            };
-            reader.readAsDataURL(event.target.files[0]);
-        }
-
-        document.getElementById('profile_image').addEventListener('change', previewImage);
-    </script>
 {% endblock %}
