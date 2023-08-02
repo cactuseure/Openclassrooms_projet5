@@ -16,22 +16,20 @@ class User
     private ?string $password = null;
     private ?DateTimeImmutable $createdAt = null;
     private ?string $role = null;
-    private ?string $profile_image = null;
     private ?string $reset_token = null;
     private bool $isActive = true;
 
     public function __construct(
-        ?string $firstName = null,
-        ?string $lastName = null,
-        ?string $email = null,
-        ?string $username = null,
-        ?string $password = null,
+        ?string            $firstName = null,
+        ?string            $lastName = null,
+        ?string            $email = null,
+        ?string            $username = null,
+        ?string            $password = null,
         ?DateTimeImmutable $createdAt = null,
-        ?string $reset_token = null,
-        ?string $role = null,
-        ?string $profile_image = null,
-        ?bool $isActive = null,
-        ?int $id = null,
+        ?string            $reset_token = null,
+        ?string            $role = null,
+        ?bool              $isActive = null,
+        ?int               $id = null,
     )
     {
         if (empty($firstName)) {
@@ -64,9 +62,6 @@ class User
         }
         if ($reset_token !== null) {
             $this->reset_token = $reset_token;
-        }
-        if ($profile_image !== null) {
-            $this->profile_image = $profile_image;
         }
         if ($isActive !== null) {
             $this->isActive = $isActive;
@@ -234,22 +229,6 @@ class User
     public function setCreatedAt(DateTimeImmutable $createdAt): void
     {
         $this->createdAt = $createdAt;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getProfileImage(): ?string
-    {
-        return $this->profile_image;
-    }
-
-    /**
-     * @param string $profile_image
-     */
-    public function setProfileImage(string $profile_image): void
-    {
-        $this->profile_image = $profile_image;
     }
 
     /**
