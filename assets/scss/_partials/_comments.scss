@@ -43,8 +43,8 @@ margin: 50px auto 100px;
       color: #fff;
       display: inline-flex;
       background: #0085ff;
-      box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 1px rgba(0, 0, 0, 0.06),
-      0px 1px 1px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 2px 1px rgba(0, 0, 0, 0.06),
+      0 1px 1px rgba(0, 0, 0, 0.08);
       border-radius: 8px;
       &:hover {
         background: lighten(#0085ff, 10%);
@@ -88,9 +88,8 @@ margin: 50px auto 100px;
   background: #fff;
   max-width: 504px;
   padding: 1rem;
-  background: #ffffff;
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 1px rgba(0, 0, 0, 0.06),
-  0px 1px 1px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 2px 1px rgba(0, 0, 0, 0.06),
+  0 1px 1px rgba(0, 0, 0, 0.08);
   border-radius: 8px;
   display: block;
   &-header {
@@ -130,7 +129,7 @@ margin: 50px auto 100px;
   padding: 12px;
   .textarea {
     width: 100%;
-    font-family: "Inter";
+    font-family: "Inter", sans-serif;
     color: #585757;
     height: 50px;
     overflow-y: auto;
@@ -143,7 +142,7 @@ margin: 50px auto 100px;
   }
   &:focus-within {
     border: 1px solid #0085ff;
-    box-shadow: 0px 0px 2px 2px rgba(0, 133, 255, 0.15);
+    box-shadow: 0 0 2px 2px rgba(0, 133, 255, 0.15);
   }
   .footer {
     margin-top: 12px;
@@ -251,7 +250,7 @@ margin: 50px auto 100px;
   user-select: none;
   align-items: stretch;
   .button-radio {
-    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
     label {
       cursor: pointer;
       padding: 4px 8px;
