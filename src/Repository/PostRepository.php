@@ -56,8 +56,8 @@ class PostRepository
     {
         $db = Db::getInstance();
 
-        $sql = "INSERT INTO post (title, slug, thumbnail, hat, content, created_at, updated_at, is_active, author_id, category_id)
-            VALUES (:title, :slug, :thumbnail, :hat, :content, :created_at, :updated_at, :is_active, :author_id, :category_id)";
+        $sql = "INSERT INTO post (title, slug, thumbnail, hat, content, created_at, updated_at, is_active, author_id)
+            VALUES (:title, :slug, :thumbnail, :hat, :content, :created_at, :updated_at, :is_active, :author_id)";
 
         $stmt = $db->prepare($sql);
 

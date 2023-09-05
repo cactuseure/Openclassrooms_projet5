@@ -93,11 +93,11 @@ class AdminController extends AbstractController
     {
         $successMessage = null;
         $errorMessage = null;
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $title = $_POST['title'] ?? '';
-            $thumbnail = $_POST['thumbnail'] ?? '';
-            $hat = $_POST['hat'] ?? '';
-            $content = $_POST['content'] ?? '';
+        if ($request->isMethod('POST')) {
+            $title = $request->request->get('title') ?? '';
+            $thumbnail = $request->request->get('thumbnail') ?? '';
+            $hat = $request->request->get('hat') ?? '';
+            $content = $request->request->get('content') ?? '';
             $postRepository = new PostRepository();
             $slug = $postRepository->generateSlug($title);
             if (empty($title) || empty($hat) || empty($content) || empty($thumbnail)) {

@@ -19,7 +19,7 @@ class UserController extends AbstractController
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function register(): Response
+    public function register(Request $request): Response
     {
         $successMessage = null;
         $errorMessage = null;
@@ -28,13 +28,13 @@ class UserController extends AbstractController
         $email = '';
         $username = '';
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $firstName = $_POST['first_name'] ?? '';
-            $lastName = $_POST['last_name'] ?? '';
-            $email = $_POST['email'] ?? '';
-            $username = $_POST['username'] ?? '';
-            $password = $_POST['password'] ?? '';
-            $confirmPassword = $_POST['confirm_password'] ?? '';
+        if ($request->isMethod('POST')) {
+            $firstName = $request->request->get('first_name') ?? '';
+            $lastName = $request->request->get('last_name') ?? '';
+            $email = $request->request->get('email') ?? '';
+            $username = $request->request->get('username') ?? '';
+            $password = $request->request->get('password') ?? '';
+            $confirmPassword = $request->request->get('confirm_password') ?? '';
 
             if (empty($firstName) || empty($lastName) || empty($email) || empty($username) || empty($password) || empty($confirmPassword)) {
                 $errorMessage = 'Veuillez remplir tous les champs du formulaire.';
@@ -86,14 +86,14 @@ class UserController extends AbstractController
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function login(): Response
+    public function login(Request $request): Response
     {
         $error = null;
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($request->isMethod('POST')) {
             $userRepository = new UserRepository();
-            $email = $_POST['email'] ?? '';
-            $password = $_POST['password'] ?? '';
+            $email = $request->request->get('email') ?? '';
+            $password = $request->request->get('password') ?? '';
 
             if (empty($email) || empty($password)) {
                 $error = 'Veuillez remplir tous les champs du formulaire.';
@@ -145,16 +145,16 @@ class UserController extends AbstractController
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function editProfile(): Response
+    public function editProfile(Request $request): Response
     {
 
         $error = null;
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $firstName = $_POST['firstName'] ?? '';
-            $lastName = $_POST['lastName'] ?? '';
-            $email = $_POST['email'] ?? '';
-            $username = $_POST['username'] ?? '';
+        if ($request->isMethod('POST')) {
+            $firstName = $request->request->get('firstName') ?? '';
+            $lastName = $request->request->get('lastName') ?? '';
+            $email = $request->request->get('email') ?? '';
+            $username = $request->request->get('username') ?? '';
 
             // Vérifie si tous les champs du formulaire sont remplis
             if (empty($firstName) || empty($lastName) || empty($email) || empty($username)) {
@@ -209,15 +209,15 @@ class UserController extends AbstractController
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function editPassword(): Response
+    public function editPassword(Request $request): Response
     {
         $successMessage = null;
         $errorMessage = null;
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_SESSION['user']['is_connected']) {
-            $last_password = $_POST['last_password'];
-            $password = $_POST['password'];
-            $confirmPassword = $_POST['confirmPassword'];
+        if ($request->isMethod('POST') && $_SESSION['user']['is_connected']) {
+            $last_password = $request->request->get('last_password');
+            $password = $request->request->get('password');
+            $confirmPassword = $request->request->get('confirmPassword');
             $userRepository = new UserRepository();
             $email = $_SESSION['user']['email'];
 
@@ -259,12 +259,12 @@ class UserController extends AbstractController
      * @throws LoaderError
      * @throws Exception
      */
-    public function forgetPassword(): Response
+    public function forgetPassword(Request $request): Response
     {
         $successMessage = null;
         $errorMessage = null;
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['email'] ?? '';
+        if ($request->isMethod('POST')) {
+            $email = $request->request->get('email') ?? '';
 
             $userRepository = new UserRepository();
             $user = $userRepository->getUserByEmail($email);
@@ -302,13 +302,13 @@ class UserController extends AbstractController
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function resetPassword(): Response
+    public function resetPassword(Request $request): Response
     {
         $successMessage = null;
         $errorMessage = null;
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $password = $_POST['password'] ?? '';
-            $confirmPassword = $_POST['password_confirm'] ?? '';
+        if ($request->isMethod('POST')) {
+            $password = $request->request->get('password') ?? '';
+            $confirmPassword = $request->request->get('password_confirm') ?? '';
 
             if (empty($password) || empty($confirmPassword)) {
                 $errorMessage = 'Veuillez remplir tous les champs du formulaire.';
