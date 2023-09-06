@@ -146,10 +146,10 @@ class AdminController extends AbstractController
         $successMessage = null;
         $errorMessage = null;
         $postRepository = new PostRepository();
-        if (isset($_GET['post_id']) && $_GET['post_id'] != null) {
-            $post = $postRepository->getPostById($_GET['post_id']);
+        if ($request->query->has('post_id')) {
+            $post = $postRepository->getPostById($request->query->get('post_id'));
             if ($post) {
-                if ($postRepository->deletePost($_GET['post_id'])) {
+                if ($postRepository->deletePost($request->query->get('post_id'))) {
                     $successMessage = 'Article : "' . $post->getTitle() . '" a été supprimé avec succès.';
                 } else {
                     $errorMessage = ' Erreur lors de la suppression';
@@ -176,10 +176,10 @@ class AdminController extends AbstractController
         $successMessage = null;
         $errorMessage = null;
         $postRepository = new PostRepository();
-        if (isset($_GET['post_id']) && $_GET['post_id'] != null) {
-            $post = $postRepository->getPostById($_GET['post_id']);
+        if ($request->query->has('post_id')) {
+            $post = $postRepository->getPostById($request->query->get('post_id'));
             if ($post) {
-                if (!$postRepository->swapStatus($_GET['post_id'])) {
+                if (!$postRepository->swapStatus($request->query->get('post_id'))) {
                     $errorMessage = 'Erreur lors du changement d\'état';
                 }
 
@@ -259,8 +259,8 @@ class AdminController extends AbstractController
         $successMessage = null;
         $errorMessage = null;
         $userRepository = new UserRepository();
-        if (isset($_GET['user_id']) && $_GET['user_id'] != null) {
-            $user = $userRepository->getUserById($_GET['user_id']);
+        if ($request->query->has('user_id')) {
+            $user = $userRepository->getUserById($request->query->get('user_id'));
             if ($user) {
                 if (!$userRepository->swapRole($user)) {
                     $errorMessage = 'Erreur lors du changement d\'état';
@@ -291,8 +291,8 @@ class AdminController extends AbstractController
         $successMessage = null;
         $errorMessage = null;
         $userRepository = new UserRepository();
-        if (isset($_GET['user_id']) && $_GET['user_id'] != null) {
-            $user = $userRepository->getUserById($_GET['user_id']);
+        if ($request->query->has('user_id')) {
+            $user = $userRepository->getUserById($request->query->get('user_id'));
             if ($user) {
                 if (!$userRepository->swapActif($user)) {
                     $errorMessage = 'Erreur lors du changement d\'état';

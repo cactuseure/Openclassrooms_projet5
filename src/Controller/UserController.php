@@ -142,15 +142,9 @@ class UserController extends AbstractController
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function account(Request $request): Response
+    public function account(): Response
     {
-        $error = null;
-        return $this->render('/app/user/mon-compte.html.twig',
-            [
-                'error' => $error,
-                'get' => $_GET,
-            ]
-        );
+        return $this->render('/app/user/mon-compte.html.twig',);
     }
 
     /**
@@ -333,10 +327,10 @@ class UserController extends AbstractController
                 $errorMessage = 'Les mots de passe ne correspondent pas.';
             } elseif (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password)) {
                 $errorMessage = 'Le mot de passe doit contenir au moins 8 caractères avec au moins une majuscule et une minuscule.';
-            } elseif (!isset($_GET['token'])) {
+            } elseif (!$request->request->has('token')) {
                 $errorMessage = 'Token expiré';
             } else {
-                $token = $_GET['token'];
+                $token = $request->request->get('token');
                 $userRepository = new UserRepository();
                 $user = $userRepository->getUserByResetToken($token);
                 if ($user !== null) {
