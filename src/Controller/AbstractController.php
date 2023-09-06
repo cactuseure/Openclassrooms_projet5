@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -14,6 +16,7 @@ use Twig\Loader\FilesystemLoader;
 abstract class AbstractController
 {
     protected Environment $twig;
+    protected SessionInterface $session;
 
     public function __construct()
     {
@@ -22,7 +25,12 @@ abstract class AbstractController
         $this->twig = new Environment($loader, [
             'debug' => true,
         ]);
-        $this->twig->addGlobal('session', $_SESSION);
+
+        $session = new Session();
+        //$session->start();
+        $this->session = $session;
+
+        $this->twig->addGlobal('session', $this->session->all());
         $this->twig->addExtension(new DebugExtension());
     }
 

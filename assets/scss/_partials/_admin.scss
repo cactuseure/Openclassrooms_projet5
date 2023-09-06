@@ -1,10 +1,10 @@
 main.admin {
-
   table {
-    p{
-      margin: 0;
-    };
     width: 100%;
+
+    p {
+      margin: 0;
+    }
 
     td {
       &.title {
@@ -13,9 +13,9 @@ main.admin {
           position: relative;
           bottom: 2px;
           left: 2px;
-
         }
       }
+
       &.actions {
         display: flex;
         flex-wrap: nowrap;
@@ -28,13 +28,13 @@ main.admin {
       }
     }
 
-    .user_role{
+    .user_role {
       display: flex;
       gap: 10px;
+
       svg {
         width: 24px;
       }
-
     }
   }
 
@@ -45,7 +45,7 @@ main.admin {
     }
 
     padding: 30px;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
     border-radius: 25px;
   }
 
@@ -68,7 +68,6 @@ main.admin {
             margin-top: auto;
           }
         }
-
       }
 
       .col-lg-9 {

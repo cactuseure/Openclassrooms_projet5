@@ -10,15 +10,19 @@ use App\Repository\UserRepository;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 class AdminController extends AbstractController
 {
-    public function __construct()
+    protected SessionInterface $session;
+
+    public function __construct(SessionInterface $session)
     {
         parent::__construct();
+        $this->session = $session;
     }
 
     /**
@@ -127,7 +131,8 @@ class AdminController extends AbstractController
 
     private function isUserLoggedInAdmin(): bool
     {
-        return (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == 'administrateur');
+        $userData = $this->session->get('user');
+        return ($userData !== null && $userData['role'] === 'administrateur');
     }
 
 

@@ -10,6 +10,7 @@ use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -18,12 +19,18 @@ class CommentController extends AbstractController
 {
     private CommentRepository $commentRepository;
     private PostRepository $postRepository;
+    protected SessionInterface $session;
 
-    public function __construct(CommentRepository $commentRepository, PostRepository $postRepository)
+    public function __construct(
+        CommentRepository $commentRepository,
+        PostRepository    $postRepository,
+        SessionInterface  $session
+    )
     {
         parent::__construct();
         $this->commentRepository = $commentRepository;
         $this->postRepository = $postRepository;
+        $this->session = $session;
     }
 
     /**
@@ -37,7 +44,7 @@ class CommentController extends AbstractController
         $commentRepository = new CommentRepository();
         $postId = $request->query->get('post_id');
         $commentId = $request->query->get('comment_id');
-        $content = $request->request->get('comment_'.$commentId);
+        $content = $request->request->get('comment_' . $commentId);
         $author = $this->getCurrentUser();
 
         if ($request->isMethod('POST') && !empty($content)) {
@@ -61,7 +68,7 @@ class CommentController extends AbstractController
                 false
             );
 
-            if ($commentId == 0){
+            if ($commentId == 0) {
                 $comment->setParentId(null);
             }
 
@@ -98,8 +105,9 @@ class CommentController extends AbstractController
 
     public function getCurrentUser(): int
     {
-        if (isset($_SESSION['user']['id'])) {
-            return $_SESSION['user']['id'];
+        $userData = $this->session->get('user');
+        if (isset($userData['id'])) {
+            return $userData['id'];
         }
         return 0;
     }

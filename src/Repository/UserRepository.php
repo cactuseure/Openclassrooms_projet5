@@ -62,28 +62,28 @@ class UserRepository
         $stmt->execute();
     }
 
-    public function isEmailTaken(string $email, bool $exceptHimself = false): bool
+    public function isEmailTaken(string $email, bool $exceptHimself = false, string $sessionEmail = ''): bool
     {
         $stmt = $this->db->prepare("SELECT * FROM `user` WHERE `email` = :email");
         $stmt->bindValue(':email', $email);
         $stmt->execute();
         $user = $stmt->fetch(\PDO::FETCH_ASSOC);
         if ($user) {
-            if ($exceptHimself && isset($_SESSION['user']['email']) && $user['email'] === $_SESSION['user']['email']) {
+            if ($exceptHimself && $user['email'] === $sessionEmail) {
                 return false;
             }
             return true;
         }
         return false;
     }
-    public function isUsernameTaken(string $username, bool $exceptHimself = false): bool
+    public function isUsernameTaken(string $username, bool $exceptHimself = false, string $sessionUsername = ''): bool
     {
         $stmt = $this->db->prepare("SELECT * FROM `user` WHERE `username` = :username");
         $stmt->bindValue(':username', $username);
         $stmt->execute();
         $user = $stmt->fetch(\PDO::FETCH_ASSOC);
         if ($user) {
-            if ($exceptHimself && isset($_SESSION['user']['username']) && $user['username'] === $_SESSION['user']['username']) {
+            if ($exceptHimself && $user['username'] === $sessionUsername) {
                 return false;
             }
             return true;

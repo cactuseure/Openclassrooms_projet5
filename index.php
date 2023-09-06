@@ -9,8 +9,11 @@ ini_set('display_errors', 1);
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 
-session_start();
+// Créez une instance de Session
+$session = new Session();
+$session->start();
 
 // Créer une instance de Request
 $request = Request::createFromGlobals();
@@ -24,10 +27,10 @@ $contactMessageRepository = new \App\Repository\ContactMessageRepository();
 
 $homeController = new \App\Controller\HomeController();
 $postController = new \App\Controller\PostController();
-$userController = new \App\Controller\UserController();
-$adminController = new \App\Controller\AdminController();
+$userController = new \App\Controller\UserController($session);
+$adminController = new \App\Controller\AdminController($session);
 $contactController = new \App\Controller\ContactController($contactMessageRepository);
-$commentController = new \App\Controller\CommentController($commentRepository, $postRepository);
+$commentController = new \App\Controller\CommentController($commentRepository, $postRepository, $session);
 
 // Récupère les données POST et GET
 $postData = $request->request->all();

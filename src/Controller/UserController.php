@@ -8,12 +8,21 @@ use DateTimeImmutable;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 class UserController extends AbstractController
 {
+    protected SessionInterface $session;
+    public function __construct(SessionInterface $session)
+    {
+        parent::__construct();
+        $this->session = $session;
+    }
+
+
     /**
      * @throws SyntaxError
      * @throws RuntimeError
@@ -101,7 +110,7 @@ class UserController extends AbstractController
                 $user = $userRepository->getUserByEmail($email);
                 if ($user && password_verify($password, $user->getPassword())) {
                     if ($user->isActive()){
-                        $_SESSION['user'] = [
+                        $userData = [
                             'id' => $user->getId(),
                             'firstName' => $user->getFirstName(),
                             'lastName' => $user->getLastName(),
@@ -111,8 +120,12 @@ class UserController extends AbstractController
                             'created_at' => $user->getCreatedAt(),
                             'is_connected' => true,
                         ];
+
+                        // Utilisez la session Symfony pour stocker les données de l'utilisateur
+                        $this->session->set('user', $userData);
+
                         return $this->redirectToRoute('mon-compte');
-                    }else{
+                    } else {
                         $error = 'Compte pas encore validé';
                     }
                 } else {
@@ -149,6 +162,7 @@ class UserController extends AbstractController
     {
 
         $error = null;
+        $userData = $this->session->get('user');
 
         if ($request->isMethod('POST')) {
             $firstName = $request->request->get('firstName') ?? '';
@@ -163,15 +177,15 @@ class UserController extends AbstractController
                 // Vérifie si l'utilisateur existe déjà dans la bdd
                 $userRepository = new UserRepository();
 
-                $existingUserMail = $userRepository->isEmailTaken($email, true);
-                $existingUserName = $userRepository->isUsernameTaken($username, true);
+                $existingUserMail = $userRepository->isEmailTaken($email, true,$userData['email']);
+                $existingUserName = $userRepository->isUsernameTaken($username, true,$userData['username']);
 
                 if ($existingUserMail) {
                     $error = 'Un compte avec cet e-mail existe déjà.';
                 } elseif ($existingUserName) {
                     $error = 'Un compte avec cet username existe déjà.';
                 } else {
-                    $user = $userRepository->getUserById($_SESSION['user']['id']);
+                    $user = $userRepository->getUserById($userData['id']);
 
                     $newUser = new User($firstName, $lastName, $email, $username,$user->getPassword(),$user->getCreatedAt(),$user->getResetToken(),$user->getRole(),$user->isActive(),$user->getId());
                     try {
@@ -179,7 +193,7 @@ class UserController extends AbstractController
                     } catch (\PDOException $e) {
                         throw new \PDOException("Erreur lors de la mise à jour de l'utilisateur : " . $e->getMessage());
                     }
-                    $_SESSION['user'] = [
+                    $this->session->set('user', [
                         'id' => $newUser->getId(),
                         'firstName' => $newUser->getFirstName(),
                         'lastName' => $newUser->getLastName(),
@@ -188,7 +202,7 @@ class UserController extends AbstractController
                         'role' => $newUser->getLabelRole(),
                         'created_at' => $newUser->getCreatedAt(),
                         'is_connected' => true,
-                    ];
+                    ]);
                     return $this->redirectToRoute('mon-compte',
                         [
                             'message-edit' => 'success'
@@ -213,13 +227,14 @@ class UserController extends AbstractController
     {
         $successMessage = null;
         $errorMessage = null;
+        $userData = $this->session->get('user');
 
-        if ($request->isMethod('POST') && $_SESSION['user']['is_connected']) {
+        if ($request->isMethod('POST') && $userData['is_connected']) {
             $last_password = $request->request->get('last_password');
             $password = $request->request->get('password');
             $confirmPassword = $request->request->get('confirmPassword');
             $userRepository = new UserRepository();
-            $email = $_SESSION['user']['email'];
+            $email = $userData['email'];
 
             if (empty($last_password) || empty($password) || empty($confirmPassword)) {
                 $errorMessage = 'Veuillez remplir tous les champs du formulaire.';
@@ -249,7 +264,8 @@ class UserController extends AbstractController
 
     public function logout(): Response
     {
-        unset($_SESSION['user']);
+        $this->session->remove('user');
+
         return $this->redirectToRoute('connexion');
     }
 
@@ -306,6 +322,7 @@ class UserController extends AbstractController
     {
         $successMessage = null;
         $errorMessage = null;
+
         if ($request->isMethod('POST')) {
             $password = $request->request->get('password') ?? '';
             $confirmPassword = $request->request->get('password_confirm') ?? '';
@@ -330,7 +347,6 @@ class UserController extends AbstractController
                     $errorMessage = 'Token invalide';
                 }
             }
-
         }
 
         return $this->render('/app/user/reset-password.html.twig', [
