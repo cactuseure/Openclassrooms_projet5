@@ -1,0 +1,18 @@
+{
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+  "require": {
+    "ext-pdo": "*",
+    "symfony/http-foundation": "*",
+    "twig/twig": "*",
+    "tinymce/tinymce" : "*",
+    "vlucas/phpdotenv" : "*",
+    "symfony/twig-bundle": "*"
+  },
+  "require-dev": {
+    "symfony/var-dumper": "*"
+  }
+}

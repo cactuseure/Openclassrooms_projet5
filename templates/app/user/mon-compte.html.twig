@@ -1,0 +1,60 @@
+{% extends 'app/user/account.html.twig' %}
+
+{% block page_title %}Mon compte{% endblock page_title %}
+
+{% block content %}
+    <div class="card mb-3" style="border-radius: .5rem;">
+        <div class="row g-0">
+            <div class="col-md-4 gradient-custom text-center text-white"
+                 style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
+                     alt="Avatar" class="img-fluid my-5" style="width: 80px;"/>
+                <h5>{{ session.user.firstName }} {{ session.user.lastName }}</h5>
+                <p>@{{ session.user.username }}</p>
+                <i class="far fa-edit mb-5"></i>
+            </div>
+            <div class="col-md-8">
+                <div class="card-body p-4">
+                    <h6>Information</h6>
+                    <hr class="mt-0 mb-4">
+                    <div class="row pt-1">
+                        <div class="col-6 mb-3">
+                            <h6>Email</h6>
+                            <p class="text-muted">{{ session.user.email }}</p>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h6>Role</h6>
+                            <p class="text-muted">{{ session.user.role }}</p>
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-6 mb-3">
+                            <h6>Membre depuis</h6>
+                            <p class="text-muted">{{ session.user.created_at|date('M. Y') }}</p>
+                        </div>
+                    </div>
+                    <h6>Actions</h6>
+                    <hr class="mt-0 mb-4">
+                    <div class="row pt-1">
+                        <div class="col-6 mb-3">
+                            <a href="/edit-profil">
+                                <button type="button" class="btn btn-dark">Modifier mon profil</button>
+                            </a>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <a href="/edit-password">
+                                <button type="button" class="btn btn-dark">Modifier mon mot de passe</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if message_success %}
+        <div class="alert alert-success">{{ message_success }}</div>
+    {% endif %}
+    {% if message_error %}
+        <div class="alert alert-danger">{{ message_error }}</div>
+    {% endif %}
+{% endblock %}

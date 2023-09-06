@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block page_title %}Accueil{% endblock %}
+{% block class_css %}homepage{% endblock %}
+
+{% block body %}
+    {% if notification.exist %}
+        <div class="notification notification-{{ notification.type }} fixed-bottom fixed-right">
+            {{ notification.message }}
+        </div>
+    {% endif %}
+
+    <div class="container">
+        <h1>{{ user.first_name }} {{ user.last_name }}</h1>
+        <img src="/path/to/photo.jpg" alt="Photo" class="img-fluid">
+        <p class="lead">Mattéo Groult, le développeur qu'il vous faut !</p>
+
+        <a href="/path/to/cv.pdf" target="_blank">Télécharger mon CV</a>
+
+        <div class="social-links">
+            <a href="https://github.com/votreusername" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://linkedin.com/in/votreusername" target="_blank"><i class="fab fa-linkedin"></i></a>
+            <a href="https://twitter.com/votreusername" target="_blank"><i class="fab fa-twitter"></i></a>
+        </div>
+    </div>
+{% endblock body %}

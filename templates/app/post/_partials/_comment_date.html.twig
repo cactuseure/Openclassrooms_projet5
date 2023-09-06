@@ -1,0 +1,16 @@
+{% set now = "now"|date_modify("+1 second") %} {# Obtient la date et l'heure actuelles #}
+{% set diff = now.diff(comment.createdAt) %} {# Calcule la différence entre maintenant et la date du commentaire #}
+
+{% if diff.years > 0 %}
+    {{ diff.years }} an{{ diff.years > 1 ? 's' : '' }}
+{% elseif diff.months > 0 %}
+    {{ diff.months }} moi{{ diff.months > 1 ? 's' : '' }}
+{% elseif diff.days > 0 %}
+    {{ diff.days }} jour{{ diff.days > 1 ? 's' : '' }}
+{% elseif diff.h > 0 %}
+    {{ diff.h }} heure{{ diff.h > 1 ? 's' : '' }}
+{% elseif diff.i > 0 %}
+    {{ diff.i }} minute{{ diff.i > 1 ? 's' : '' }}
+{% else %}
+    {{ diff.s }} seconde{{ diff.s > 1 ? 's' : '' }}
+{% endif %}

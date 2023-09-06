@@ -1,0 +1,67 @@
+{% extends 'app/admin/admin.html.twig' %}
+
+{% block page_title %}Commentaires ADMIN{% endblock page_title %}
+
+{% block content %}
+    {% if message_success %}
+        <div class="alert alert-success">{{ message_success }}</div>
+    {% endif %}
+    {% if message_error %}
+        <div class="alert alert-danger">{{ message_error }}</div>
+    {% endif %}
+    <table>
+        <thead>
+        <tr>
+            <th>Contenu</th>
+            <th>Auteur</th>
+            <th>Date</th>
+            <th>Article lié</th>
+            <th>Valider</th>
+            <th>Supprimer</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for comment in comments %}
+            <tr>
+                <td>{{ comment.getContent()|raw }}</td>
+                <td>{{ arrayAuthor[comment.getId()] }}</td>
+                <td>le {{ comment.getcreatedAt()|date('d/m') }} à {{ comment.getcreatedAt()|date('H') }}h{{ comment.getcreatedAt()|date('i') }}</td>
+                <td>
+                    <a href="/article/{{ postRepository.getPostById(comment.getPostId()).getSlug() }}" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="25px" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/>
+                        </svg>
+                    </a>
+                </td>
+                <td>
+                    {% if comment.isApproved() %}
+                    <a href="/admin/approve-comment?comment_id={{ comment.getId() }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="25px" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+
+                    </a>
+                    {% else %}
+                    <a href="/admin/approve-comment?comment_id={{ comment.getId() }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="25px" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+
+                </td>
+                <td>
+                    <a href="/admin/remove-comment?comment_id={{ comment.id }}"
+                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer définitivement ce commentaire ?');">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="25px"
+                             stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                        </svg>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

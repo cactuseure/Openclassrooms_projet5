@@ -1,0 +1,14 @@
+{
+  "name": "www",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "node-sass": "^9.0.0"
+  },
+  "scripts": {
+    "scss": "node-sass --watch assets/scss -o assets/css"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
