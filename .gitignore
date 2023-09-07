@@ -10,6 +10,7 @@ composer.phar
 
 # Fichiers d'environnement spécifiques à chaque développeur
 .env
+.env.dev
 .idea
 .css.map
 .lock

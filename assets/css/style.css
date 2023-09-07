@@ -69,6 +69,20 @@ header > nav {
   /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   background: linear-gradient(to right bottom, #f6d365, #fda085); }
 
+body main.homepage .social-links svg {
+  height: 40px;
+  width: 40px; }
+
+body main.homepage img.img-fluid {
+  border-radius: 100%; }
+
+body main.homepage .row {
+  align-items: center; }
+
+body main.homepage h1 {
+  text-align: center;
+  margin-bottom: 75px; }
+
 body main > .container {
   margin: 100px auto 0 auto; }
 
