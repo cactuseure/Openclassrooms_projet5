@@ -8,7 +8,7 @@ Le projet consiste à développer un blog professionnel.
 
 **Step 1 :**
 ```bash
-  git clone https://github.com/](https://github.com/cactuseure/Openclassrooms_projet5.git
+  git clone https://github.com/cactuseure/Openclassrooms_projet5.git
 ```
 
 **Step 2 :**
