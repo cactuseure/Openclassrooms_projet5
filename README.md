@@ -7,29 +7,23 @@ Le projet consiste à développer un blog professionnel.
 ## Deployment
 
 **Step 1 :**
+```bash
+  git clone https://github.com/](https://github.com/cactuseure/Openclassrooms_projet5.git
+```
 
-À la racine du projet, créez un `.env` et enregistré ces valeurs : 
+**Step 2 :**
+
+À la racine du projet, créez un fichier `.env` et enregistré ces valeurs : 
 - DB_HOST
 - DB_NAME
 - DB_USER
 - DB_PASSWORD
 - CONTACT_EMAIL
 
-**Step 2 :**
+**Step 3 :**
 ```bash
   composer install
 ```
-
-**Step 3 :**
-```bash
-  npm install
-```
-
-**Step 4 :**
-```bash
-  npm run scss
-```
-
 
 
 ## Authors
