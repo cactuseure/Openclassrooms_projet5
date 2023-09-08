@@ -32,6 +32,8 @@ class AdminController extends AbstractController
      */
     public function listPosts(): Response
     {
+        $this->redirectIfNotAdmin();
+
         $postRepository = new PostRepository();
         $posts = $postRepository->getAllPosts();
 
@@ -41,6 +43,7 @@ class AdminController extends AbstractController
     }
 
 
+
     /**
      * @throws SyntaxError
      * @throws RuntimeError
@@ -48,6 +51,8 @@ class AdminController extends AbstractController
      */
     public function editPost(Request $request): Response
     {
+        $this->redirectIfNotAdmin();
+
         $successMessage = null;
         $errorMessage = null;
         $post = null;
@@ -95,6 +100,8 @@ class AdminController extends AbstractController
      */
     public function addPost(Request $request): Response
     {
+        $this->redirectIfNotAdmin();
+
         $successMessage = null;
         $errorMessage = null;
         if ($request->isMethod('POST')) {
@@ -143,6 +150,8 @@ class AdminController extends AbstractController
      */
     public function deletePost(Request $request): Response
     {
+        $this->redirectIfNotAdmin();
+
         $successMessage = null;
         $errorMessage = null;
         $postRepository = new PostRepository();
@@ -173,6 +182,8 @@ class AdminController extends AbstractController
      */
     public function swapStatus(Request $request): Response
     {
+        $this->redirectIfNotAdmin();
+
         $successMessage = null;
         $errorMessage = null;
         $postRepository = new PostRepository();
@@ -208,6 +219,8 @@ class AdminController extends AbstractController
      */
     public function listComments(Request $request): Response
     {
+        $this->redirectIfNotAdmin();
+
         $commentRepository = new CommentRepository();
         $postRepository = new PostRepository();
         $userRepository = new UserRepository();
@@ -237,6 +250,8 @@ class AdminController extends AbstractController
      */
     public function listUsers(Request $request): Response
     {
+        $this->redirectIfNotAdmin();
+
         $userRepository = new UserRepository();
         $users = $userRepository->getUsers();
         $successMessage = $this->getSuccessMessage($request);
@@ -256,6 +271,8 @@ class AdminController extends AbstractController
      */
     public function swapUserRole(Request $request): Response
     {
+        $this->redirectIfNotAdmin();
+
         $successMessage = null;
         $errorMessage = null;
         $userRepository = new UserRepository();
@@ -288,6 +305,8 @@ class AdminController extends AbstractController
      */
     public function swapUserStatus(Request $request): Response
     {
+        $this->redirectIfNotAdmin();
+
         $successMessage = null;
         $errorMessage = null;
         $userRepository = new UserRepository();
@@ -339,6 +358,8 @@ class AdminController extends AbstractController
      */
     public function removeComment(Request $request): Response
     {
+        $this->redirectIfNotAdmin();
+
         $successMessage = null;
         $errorMessage = null;
 
@@ -371,6 +392,7 @@ class AdminController extends AbstractController
      */
     public function approveComment(Request $request): Response
     {
+        $this->redirectIfNotAdmin();
         $successMessage = null;
         $errorMessage = null;
 
@@ -400,5 +422,12 @@ class AdminController extends AbstractController
         ]);
     }
 
+
+    private function redirectIfNotAdmin(): void
+    {
+        if (!$this->isUserLoggedInAdmin()){
+            header('Location: https://projet5.matteo-groult.com/');
+        }
+    }
 
 }
