@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Exception;
+use PDOException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -13,9 +14,13 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
+/**
+ * Contrôleur pour la gestion des utilisateurs.
+ */
 class UserController extends AbstractController
 {
     protected SessionInterface $session;
+
     public function __construct(SessionInterface $session)
     {
         parent::__construct();
@@ -24,9 +29,13 @@ class UserController extends AbstractController
 
 
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * Affiche le formulaire d'inscription et traite les données postées.
+     *
+     * @param Request $request
+     * @return Response
      * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function register(Request $request): Response
     {
@@ -61,17 +70,15 @@ class UserController extends AbstractController
                 } elseif ($existingUserName) {
                     $errorMessage = 'Un compte avec cet username existe déjà.';
                 } else {
-                    $user = new User(
-                        $firstName,
-                        $lastName,
-                        $email,
-                        $username,
-                        password_hash($password, PASSWORD_DEFAULT),
-                        new DateTimeImmutable(),
-                        null,
-                        'ROLE_USER',
-                        false
-                    );
+                    $user = new User();
+                    $user->setFirstName($firstName);
+                    $user->setLastName($lastName);
+                    $user->setEmail($email);
+                    $user->setUsername($username);
+                    $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
+                    $user->setRole('ROLE_USER');
+                    $user->setCreatedAt(new DateTimeImmutable());
+                    $user->setActive(false);
                     $userRepository->createUser($user);
                     $successMessage = 'Inscription enregistré, en attende de validation';
                 }
@@ -90,10 +97,15 @@ class UserController extends AbstractController
         );
     }
 
+
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * Gère la connexion de l'utilisateur et les vérifications associées.
+     *
+     * @param Request $request
+     * @return Response
      * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function login(Request $request): Response
     {
@@ -109,7 +121,7 @@ class UserController extends AbstractController
             } else {
                 $user = $userRepository->getUserByEmail($email);
                 if ($user && password_verify($password, $user->getPassword())) {
-                    if ($user->isActive()){
+                    if ($user->isActive()) {
                         $userData = [
                             'id' => $user->getId(),
                             'firstName' => $user->getFirstName(),
@@ -137,20 +149,29 @@ class UserController extends AbstractController
         return $this->render('/app/user/login.html.twig', ['error' => $error]);
     }
 
+
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * Affiche la page de compte de l'utilisateur connecté.
+     *
+     * @return Response
      * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function account(): Response
     {
-        return $this->render('/app/user/mon-compte.html.twig',);
+        return $this->render('/app/user/mon-compte.html.twig');
     }
 
+
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * Traite la modification du profil de l'utilisateur.
+     *
+     * @param Request $request
+     * @return Response
      * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function editProfile(Request $request): Response
     {
@@ -171,8 +192,8 @@ class UserController extends AbstractController
                 // Vérifie si l'utilisateur existe déjà dans la bdd
                 $userRepository = new UserRepository();
 
-                $existingUserMail = $userRepository->isEmailTaken($email, true,$userData['email']);
-                $existingUserName = $userRepository->isUsernameTaken($username, true,$userData['username']);
+                $existingUserMail = $userRepository->isEmailTaken($email, true, $userData['email']);
+                $existingUserName = $userRepository->isUsernameTaken($username, true, $userData['username']);
 
                 if ($existingUserMail) {
                     $error = 'Un compte avec cet e-mail existe déjà.';
@@ -180,21 +201,23 @@ class UserController extends AbstractController
                     $error = 'Un compte avec cet username existe déjà.';
                 } else {
                     $user = $userRepository->getUserById($userData['id']);
-
-                    $newUser = new User($firstName, $lastName, $email, $username,$user->getPassword(),$user->getCreatedAt(),$user->getResetToken(),$user->getRole(),$user->isActive(),$user->getId());
+                    $user->setFirstName($firstName);
+                    $user->setLastName($lastName);
+                    $user->setEmail($email);
+                    $user->setUsername($username);
                     try {
-                        $userRepository->updateUser($newUser);
-                    } catch (\PDOException $e) {
-                        throw new \PDOException("Erreur lors de la mise à jour de l'utilisateur : " . $e->getMessage());
+                        $userRepository->updateUser($user);
+                    } catch (PDOException $e) {
+                        throw new PDOException("Erreur lors de la mise à jour de l'utilisateur : " . $e->getMessage());
                     }
                     $this->session->set('user', [
-                        'id' => $newUser->getId(),
-                        'firstName' => $newUser->getFirstName(),
-                        'lastName' => $newUser->getLastName(),
-                        'email' => $newUser->getEmail(),
-                        'username' => $newUser->getUsername(),
-                        'role' => $newUser->getLabelRole(),
-                        'created_at' => $newUser->getCreatedAt(),
+                        'id' => $user->getId(),
+                        'firstName' => $user->getFirstName(),
+                        'lastName' => $user->getLastName(),
+                        'email' => $user->getEmail(),
+                        'username' => $user->getUsername(),
+                        'role' => $user->getLabelRole(),
+                        'created_at' => $user->getCreatedAt(),
                         'is_connected' => true,
                     ]);
                     return $this->redirectToRoute('mon-compte',
@@ -212,10 +235,15 @@ class UserController extends AbstractController
         );
     }
 
+
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * Traite la modification du mot de passe de l'utilisateur.
+     *
+     * @param Request $request
+     * @return Response
      * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function editPassword(Request $request): Response
     {
@@ -256,6 +284,11 @@ class UserController extends AbstractController
 
     }
 
+    /**
+     * Déconnecte l'utilisateur en supprimant les données de session.
+     *
+     * @return Response
+     */
     public function logout(): Response
     {
         $this->session->remove('user');
@@ -263,10 +296,15 @@ class UserController extends AbstractController
         return $this->redirectToRoute('connexion');
     }
 
+
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * Traite la demande de réinitialisation de mot de passe.
+     *
+     * @param Request $request
+     * @return Response
      * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      * @throws Exception
      */
     public function forgetPassword(Request $request): Response
@@ -308,9 +346,13 @@ class UserController extends AbstractController
 
 
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * Traite la réinitialisation du mot de passe en utilisant un token.
+     *
+     * @param Request $request
+     * @return Response
      * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function resetPassword(Request $request): Response
     {

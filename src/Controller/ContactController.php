@@ -12,6 +12,9 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
+/**
+ * Contrôleur pour la gestion du formulaire de contact.
+ */
 class ContactController extends AbstractController
 {
     private ContactMessageRepository $contactMessageRepository;
@@ -22,10 +25,15 @@ class ContactController extends AbstractController
         $this->contactMessageRepository = $contactMessageRepository;
     }
 
+
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * Gère la soumission et le traitement du formulaire de contact.
+     *
+     * @param Request $request
+     * @return Response
      * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function contactForm(Request $request): Response
     {
@@ -58,37 +66,33 @@ class ContactController extends AbstractController
             }
 
             if (count($errors) === 0) {
-                $contactMessage = new ContactMessage(
-                    $name,
-                    $lastname,
-                    $email,
-                    $messageContent,
-                    new DateTimeImmutable()
-                );
 
-                $recipientEmail = $_ENV['CONTACT_EMAIL']; // Remplacer 'CONTACT_EMAIL' par la clé réelle définie dans .env
+                $contactMessage = new ContactMessage();
+                $contactMessage->setName($name);
+                $contactMessage->setLastname($lastname);
+                $contactMessage->setEmail($email);
+                $contactMessage->setMessage($messageContent);
+                $contactMessage->setCreatedAt(new DateTimeImmutable());
+
+
+                $recipientEmail = $_ENV['CONTACT_EMAIL'];
                 $subject = 'Nouveau message de contact';
                 $headers = 'From: ' . $email;
 
                 $mailSent = mail($recipientEmail, $subject, $messageContent, $headers);
 
                 if ($mailSent) {
-                    // Enregistrement en base de données à l'aide de la méthode saveContactMessage
                     $isSaved = $this->contactMessageRepository->saveContactMessage($contactMessage);
 
                     if ($isSaved) {
-                        // Message de succès pour l'utilisateur
                         $successMessage = 'Votre message a été envoyé avec succès.';
                     } else {
-                        // Message d'erreur si l'enregistrement en base de données a échoué
                         $errorMessage = 'Erreur lors de l\'enregistrement du message.';
                     }
                 } else {
-                    // Message d'erreur si l'envoi du mail a échoué
                     $errorMessage = 'Erreur lors de l\'envoi du message. Veuillez réessayer plus tard.';
                 }
             } else {
-                // Il y a des erreurs, afficher les messages d'erreur
                 $errorMessage = 'Veuillez corriger les erreurs dans le formulaire.';
             }
         }
@@ -97,7 +101,7 @@ class ContactController extends AbstractController
         return $this->render('app/home/contact.html.twig', [
             'message_success' => $successMessage,
             'message_error' => $errorMessage,
-            'errors' => $errors, // Passer les erreurs à la vue pour les afficher
+            'errors' => $errors,
         ]);
     }
 }

@@ -8,64 +8,40 @@ class User
 {
     public const ROLE_USER = 'ROLE_USER';
     public const ROLE_ADMIN = 'ROLE_ADMIN';
-    private ?int $id = null;
-    private ?string $firstName = null;
-    private ?string $lastName = null;
-    private ?string $email = null;
-    private ?string $username = null;
-    private ?string $password = null;
-    private ?DateTimeImmutable $createdAt = null;
-    private ?string $role = null;
-    private ?string $reset_token = null;
-    private bool $isActive = true;
+    private ?int $id;
+    private ?string $firstName;
+    private ?string $lastName;
+    private ?string $email;
+    private ?string $username;
+    private ?string $password;
+    private ?DateTimeImmutable $created_at;
+    private ?string $role;
+    private ?string $reset_token;
+    private ?bool $is_active;
 
     public function __construct(
-        ?string            $firstName = null,
-        ?string            $lastName = null,
-        ?string            $email = null,
-        ?string            $username = null,
-        ?string            $password = null,
-        ?DateTimeImmutable $createdAt = null,
-        ?string            $reset_token = null,
-        ?string            $role = null,
-        ?bool              $isActive = null,
-        ?int               $id = null,
+        int               $id = null,
+        string            $firstName = null,
+        string            $lastName = null,
+        string            $email = null,
+        string            $username = null,
+        string            $password = null,
+        string            $reset_token = null,
+        string            $role = null,
+        DateTimeImmutable $created_at = null,
+        bool              $is_active = null,
     )
     {
-        if (empty($firstName)) {
-            throw new \InvalidArgumentException('Le prénom ne peut pas être vide.');
-        }
-
-        if (empty($lastName)) {
-            throw new \InvalidArgumentException('Le nom de famille ne peut pas être vide.');
-        }
-
-        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new \InvalidArgumentException('L\'adresse email n\'est pas valide.');
-        }
-
-        if (empty($username)) {
-            throw new \InvalidArgumentException('Le pseudo n\'est pas valide.');
-        }
-
-        if ($id !== null) {
-            $this->id = $id;
-        }
+        $this->id = $id;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->email = $email;
         $this->username = $username;
         $this->password = $password;
-        $this->createdAt = $createdAt;
-        if ($role !== null) {
-            $this->role = $role;
-        }
-        if ($reset_token !== null) {
-            $this->reset_token = $reset_token;
-        }
-        if ($isActive !== null) {
-            $this->isActive = $isActive;
-        }
+        $this->role = $role;
+        $this->reset_token = $reset_token;
+        $this->created_at = $created_at;
+        $this->is_active = $is_active;
     }
 
     /**
@@ -188,11 +164,18 @@ class User
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getUsername(): ?string
     {
         return $this->username;
     }
 
+    /**
+     * @param string $username
+     * @return $this
+     */
     public function setUsername(string $username): self
     {
         $this->username = $username;
@@ -220,15 +203,15 @@ class User
      */
     public function getCreatedAt(): DateTimeImmutable
     {
-        return $this->createdAt;
+        return $this->created_at;
     }
 
     /**
-     * @param DateTimeImmutable $createdAt
+     * @param DateTimeImmutable $created_at
      */
-    public function setCreatedAt(DateTimeImmutable $createdAt): void
+    public function setCreatedAt(DateTimeImmutable $created_at): void
     {
-        $this->createdAt = $createdAt;
+        $this->created_at = $created_at;
     }
 
     /**
@@ -236,7 +219,7 @@ class User
      */
     public function isActive(): bool
     {
-        return $this->isActive;
+        return $this->is_active;
     }
 
     /**
@@ -244,6 +227,31 @@ class User
      */
     public function setActive(bool $isActive): void
     {
-        $this->isActive = $isActive;
+        $this->is_active = $isActive;
+    }
+
+
+    /**
+     * @param array $data
+     * @return User|null
+     */
+    public static function createFromDatabase(array $data): ?User
+    {
+        if (!$data) {
+            return null;
+        }
+        $createdAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['created_at']);
+        return new self(
+            $data['id'],
+            $data['first_name'],
+            $data['last_name'],
+            $data['email'],
+            $data['username'],
+            $data['password'],
+            $data['reset_token'],
+            $data['role'],
+            $createdAt,
+            $data['is_active'],
+        );
     }
 }

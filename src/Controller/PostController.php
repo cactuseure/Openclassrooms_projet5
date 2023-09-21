@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Comment;
 use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
 use App\Repository\UserRepository;
@@ -11,6 +10,9 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
+/**
+ *
+ */
 class PostController extends AbstractController
 {
     private PostRepository $postRepository;
@@ -23,20 +25,29 @@ class PostController extends AbstractController
         $this->commentRepository = new CommentRepository();
     }
 
+
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * Affiche la liste des articles (posts) du site.
+     *
+     * @return Response
      * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function index(): Response
     {
         return $this->render('app/post/posts.html.twig', ['posts' => $this->postRepository->getPosts()]);
     }
 
+
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
+     * Affiche un article (post) en fonction de son slug.
+     *
+     * @param string $slug
+     * @return Response
      * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function show(string $slug): Response
     {

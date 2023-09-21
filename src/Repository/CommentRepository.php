@@ -1,102 +1,86 @@
 <?php
-
 namespace App\Repository;
 
 use App\Core\Db;
 use App\Entity\Comment;
-use DateTimeImmutable;
-use Exception;
 use PDO;
+use PDOStatement;
 
+/**
+ * Classe de gestion des commentaires en base de données.
+ */
 class CommentRepository
 {
-    private ?\PDO $db;
+    private ?PDO $db;
 
     public function __construct()
     {
         $this->db = Db::getInstance();
     }
 
+
+    /**
+     * Crée un commentaire dans la base de données.
+     *
+     * @param Comment $comment Le commentaire à créer.
+     */
     public function createComment(Comment $comment): void
     {
         $db = Db::getInstance();
-
-        $sql = "INSERT INTO comments (content, author_id, created_at, parent_id, post_id, is_approved)
-            VALUES (:content, :author, :created_at, :parent_id, :post_id, :is_approved)";
-
+        $sql = "INSERT INTO comments (content, user_id, created_at, parent_id, post_id, is_approved) 
+                VALUES (:content, :user_id, :created_at, :parent_id, :post_id, :is_approved)";
         $stmt = $db->prepare($sql);
-
         $stmt->bindValue(':content', $comment->getContent());
-        $stmt->bindValue(':author', $comment->getAuthorId());
+        $stmt->bindValue(':user_id', $comment->getAuthorId());
         $stmt->bindValue(':created_at', $comment->getCreatedAt()->format('Y-m-d H:i:s'));
         $stmt->bindValue(':parent_id', $comment->getParentId());
         $stmt->bindValue(':post_id', $comment->getPostId());
         $stmt->bindValue(':is_approved', $comment->isApproved());
-
         $stmt->execute();
     }
 
     /**
-     * @throws Exception
+     * Récupère tous les commentaires depuis la base de données.
+     *
+     * @return array Liste des commentaires.
      */
     public function getAllComments(): array
     {
         $query = $this->db->query('SELECT * FROM comments');
-        $results = $query->fetchAll();
+        $results = $query->fetchAll(PDO::FETCH_ASSOC);
         $comments = [];
-        foreach ($results as $result) {
-            $comment = new Comment(
-                $result['id'],
-                $result['content'],
-                $result['author_id'],
-                new DateTimeImmutable($result['created_at']),
-                $result['parent_id'],
-                $result['post_id'],
-                $result['is_approved']
-            );
+        foreach ($results as $data) {
+            $comment = Comment::createFromDatabase($data);
             $comments[] = $comment;
         }
-
         return $comments;
     }
 
-    public function getApprovedComments(): array
-    {
-        $query = $this->db->query('SELECT * FROM comments WHERE is_approved = 1');
-        $results = $query->fetchAll();
-        $comments = [];
-        foreach ($results as $result) {
-            $comment = new Comment(
-                $result['id'],
-                $result['content'],
-                $result['author_id'],
-                new DateTimeImmutable($result['created_at']),
-                $result['parent_id'],
-                $result['post_id'],
-                $result['is_approved']
-            );
-            $comments[] = $comment;
-        }
-
-        return $comments;
-    }
-
-
-
+    /**
+     * Récupère les commentaires liés à un article spécifique depuis la base de données.
+     *
+     * @param int $postId L'identifiant de l'article.
+     * @return array Liste des commentaires liés à l'article.
+     */
     public function getCommentsByPostId(int $postId): array
     {
         $query = $this->db->prepare('SELECT * FROM comments WHERE post_id = :post_id AND is_approved = 1');
         $query->execute(['post_id' => $postId]);
         $results = $query->fetchAll(PDO::FETCH_ASSOC);
         $comments = [];
-        foreach ($results as $result) {
-            $comment = $this->getComment($result);
+        foreach ($results as $data) {
+            $comment = Comment::createFromDatabase($data);
             $comments[] = $comment;
         }
-
         return $comments;
     }
 
+    /**
+     * Récupère un commentaire par son identifiant depuis la base de données.
+     *
+     * @param int $commentId L'identifiant du commentaire.
+     * @return Comment|null Le commentaire ou null s'il n'existe pas.
+     */
     public function getCommentById(int $commentId): ?Comment
     {
         $query = $this->db->prepare('SELECT * FROM comments WHERE id = :id');
@@ -105,88 +89,79 @@ class CommentRepository
         if (!$result) {
             return null;
         }
-        return $this->getComment($result);
-    }
-
-    public function updateComment(Comment $comment): bool
-    {
-        $db = Db::getInstance();
-
-        $sql = "UPDATE comments SET 
-                    content = :content,
-                    author_id = :author_id,
-                    created_at = :created_at,
-                    parent_id = :parent_id,
-                    post_id = :post_id,
-                    is_approved = :is_approved
-                WHERE id = :id";
-
-        $stmt = $this->getCommentByPDO($db, $sql, $comment);
-        $stmt->bindValue(':id', $comment->getId());
-
-        return $stmt->execute();
-    }
-
-    public function deleteComment(int $commentId): bool
-    {
-        $db = Db::getInstance();
-
-        $sql = "DELETE FROM comments WHERE id = :id";
-
-        $stmt = $db->prepare($sql);
-        $stmt->bindValue(':id', $commentId);
-
-        return $stmt->execute();
-    }
-
-    private function getComment(array $result): Comment
-    {
-        $createdAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $result['created_at']);
-
-        return new Comment(
-            $result['id'],
-            $result['content'],
-            $result['author_id'],
-            $createdAt,
-            $result['parent_id'],
-            $result['post_id'],
-            $result['is_approved']
-        );
+        return Comment::createFromDatabase($result);
     }
 
     /**
-     * @param PDO|null $db
-     * @param string $sql
-     * @param Comment $comment
-     * @return false|\PDOStatement
+     * Met à jour un commentaire dans la base de données.
+     *
+     * @param Comment $comment Le commentaire à mettre à jour.
+     * @return bool true si la mise à jour a réussi, sinon false.
      */
-    public function getCommentByPDO(?PDO $db, string $sql, Comment $comment): \PDOStatement|false
+    public function updateComment(Comment $comment): bool
+    {
+        $db = Db::getInstance();
+        $sql = "UPDATE comments SET content = :content, user_id = :user_id, 
+                created_at = :created_at, parent_id = :parent_id, post_id = :post_id, 
+                is_approved = :is_approved WHERE id = :id";
+        $stmt = $this->getCommentByPDO($db, $sql, $comment);
+        $stmt->bindValue(':id', $comment->getId());
+        return $stmt->execute();
+    }
+
+    /**
+     * Supprime un commentaire de la base de données.
+     *
+     * @param int $commentId L'identifiant du commentaire à supprimer.
+     * @return bool true si la suppression a réussi, sinon false.
+     */
+    public function deleteComment(int $commentId): bool
+    {
+        $db = Db::getInstance();
+        $sql = "DELETE FROM comments WHERE id = :id";
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':id', $commentId);
+        return $stmt->execute();
+    }
+
+    /**
+     * Récupère les identifiants des commentaires enfants d'un commentaire parent donné.
+     *
+     * @param int|null $id L'identifiant du commentaire parent.
+     * @return array|null Liste des identifiants des commentaires enfants ou null s'il n'y en a pas.
+     */
+    public function setChildren(?int $id): array|null
+    {
+        $query = $this->db->prepare('SELECT * FROM comments WHERE parent_id = :parent_id AND is_approved = 1');
+        $query->execute(['parent_id' => $id]);
+        $result = $query->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($result)) {
+            return [];
+        }
+        $array = [];
+        foreach ($result as $comment) {
+            $array[] = $comment['id'];
+        }
+        return $array;
+    }
+
+    /**
+     * Obtient une instance de PDOStatement pour la mise à jour d'un commentaire.
+     *
+     * @param PDO|null $db L'instance de PDO.
+     * @param string $sql La requête SQL.
+     * @param Comment $comment Le commentaire à mettre à jour.
+     * @return PDOStatement|false L'instance de PDOStatement ou false en cas d'erreur.
+     */
+    public function getCommentByPDO(?PDO $db, string $sql, Comment $comment): PDOStatement|false
     {
         $stmt = $db->prepare($sql);
-
         $stmt->bindValue(':content', $comment->getContent());
-        $stmt->bindValue(':author_id', $comment->getAuthorId());
+        $stmt->bindValue(':user_id', $comment->getAuthorId());
         $stmt->bindValue(':created_at', $comment->getCreatedAt()->format('Y-m-d H:i:s'));
         $stmt->bindValue(':parent_id', $comment->getParentId());
         $stmt->bindValue(':post_id', $comment->getPostId());
         $stmt->bindValue(':is_approved', $comment->isApproved());
         return $stmt;
-    }
-
-    public function setChildren(?int $id): array|null
-    {
-        $query = $this->db->prepare('SELECT * FROM comments WHERE parent_id = :parent_id AND is_approved = 1');
-        $query->execute(['parent_id' => $id]);
-        $result = $query->fetchAll();
-        if (empty($result)) {
-            return null;
-        }
-        $array = [];
-        /** @var Comment $comment */
-        foreach ($result as $comment){
-            $array[] = $comment['id'];
-        }
-
-        return $array;
     }
 }

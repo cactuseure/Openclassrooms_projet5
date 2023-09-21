@@ -2,169 +2,229 @@
 
 namespace App\Entity;
 
-use App\Core\Db;
 use DateTimeImmutable;
 
 class Post
 {
-    private ?int $id = null;
-    private ?string $title = null;
-    private ?string $slug = null;
-    private ?string $thumbnail = null;
-    private ?string $hat = null;
-    private ?string $content = null;
-    private ?DateTimeImmutable $createdAt = null;
-    private ?DateTimeImmutable $updatedAt = null;
-    private ?bool $isActive = null;
-    private ?int $authorId = null;
+    private ?int $id;
+    private ?string $title;
+    private ?string $slug;
+    private ?string $thumbnail;
+    private ?string $hat;
+    private ?string $content;
+    private ?DateTimeImmutable $created_at;
+    private ?DateTimeImmutable $updated_at;
+    private ?Bool $is_active;
+    private ?int $user_id;
 
     public function __construct(
-        ?string $title = null,
-        ?string $slug = null,
-        ?string $thumbnail = null,
-        ?string $hat = null,
-        ?string $content = null,
-        ?DateTimeImmutable $createdAt = null,
-        ?DateTimeImmutable $updatedAt = null,
-        ?bool $isActive = null,
-        ?int $authorId = null,
-        ?int $id = null,
+        int $id = null,
+        string $title = null,
+        string $slug = null,
+        string $thumbnail = null,
+        string $hat = null,
+        string $content = null,
+        DateTimeImmutable $created_at = null,
+        DateTimeImmutable $updated_at = null,
+        bool $is_active = null,
+        int $user_id = null,
     )
     {
-        if ($title !== null) {
-            $this->title = $title;
-        }
-        if ($slug !== null) {
-            $this->slug = $slug;
-        }
-        if ($thumbnail !== null) {
-            $this->thumbnail = $thumbnail;
-        }
-        if ($hat !== null) {
-            $this->hat = $hat;
-        }
-        if ($content !== null) {
-            $this->content = $content;
-        }
-        if ($createdAt !== null) {
-            $this->createdAt = $createdAt;
-        }
-        if ($updatedAt !== null) {
-            $this->updatedAt = $updatedAt;
-        }
-        if ($isActive !== null) {
-            $this->isActive = $isActive;
-        }
-        if ($authorId !== null) {
-            $this->authorId = $authorId;
-        }
-        if ($id !== null) {
-            $this->id = $id;
-        }
+        $this->id = $id;
+        $this->title = $title;
+        $this->slug = $slug;
+        $this->thumbnail = $thumbnail;
+        $this->hat = $hat;
+        $this->content = $content;
+        $this->created_at = $created_at;
+        $this->updated_at = $updated_at;
+        $this->is_active = $is_active;
+        $this->user_id = $user_id;
     }
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @return string|null
+     */
     public function getTitle(): ?string
     {
         return $this->title;
     }
 
+    /**
+     * @param $title
+     * @return void
+     */
     public function setTitle($title): void
     {
         $this->title = $title;
     }
 
+    /**
+     * @return string|null
+     */
     public function getSlug(): ?string
     {
         return $this->slug;
     }
 
+    /**
+     * @param $slug
+     * @return void
+     */
     public function setSlug($slug): void
     {
         $this->slug = $slug;
     }
 
+    /**
+     * @return string|null
+     */
     public function getThumbnail(): ?string
     {
         return $this->thumbnail;
     }
 
+    /**
+     * @param $thumbnail
+     * @return void
+     */
     public function setThumbnail($thumbnail): void
     {
         $this->thumbnail = $thumbnail;
     }
 
+    /**
+     * @return string
+     */
     public function getHat(): string
     {
         return $this->hat;
     }
 
+    /**
+     * @param $hat
+     * @return void
+     */
     public function setHat($hat): void
     {
         $this->hat = $hat;
     }
 
+    /**
+     * @return string
+     */
     public function getContent(): string
     {
         return $this->content;
     }
 
+    /**
+     * @param $content
+     * @return void
+     */
     public function setContent($content): void
     {
         $this->content = $content;
     }
 
+    /**
+     * @return DateTimeImmutable
+     */
     public function getCreatedAt(): DateTimeImmutable
     {
-        return $this->createdAt;
+        return $this->created_at;
     }
 
-    public function setCreatedAt($createdAt): void
+    /**
+     * @param DateTimeImmutable $createdAt
+     * @return void
+     */
+    public function setCreatedAt(DateTimeImmutable $createdAt): void
     {
-        $this->createdAt = $createdAt;
+        $this->created_at = $createdAt;
     }
 
+    /**
+     * @return DateTimeImmutable
+     */
     public function getUpdatedAt(): DateTimeImmutable
     {
-        return $this->updatedAt;
+        return $this->updated_at;
     }
 
+    /**
+     * @param $updatedAt
+     * @return void
+     */
     public function setUpdatedAt($updatedAt): void
     {
-        $this->updatedAt = $updatedAt;
+        $this->updated_at = $updatedAt;
     }
 
-    public function getAuthorId(): int
+    /**
+     * @return int
+     */
+    public function getUserId(): int
     {
-        return $this->authorId;
+        return $this->user_id;
     }
 
-    public function setAuthorId($authorId): void
+    /**
+     * @param $user_id
+     * @return void
+     */
+    public function setUserId($user_id): void
     {
-        $this->authorId = $authorId;
+        $this->user_id = $user_id;
     }
 
-    public function getCategoryId(): ?int
-    {
-        return $this->categoryId;
-    }
-
-    public function setCategoryId(?int $categoryId): void
-    {
-        $this->categoryId = $categoryId;
-    }
-
+    /**
+     * @return bool
+     */
     public function isActive(): bool
     {
-        return $this->isActive;
+        return $this->is_active;
     }
 
-    public function setIsActive(bool $isActive): void
+    /**
+     * @param bool $is_active
+     * @return void
+     */
+    public function setIsActive(bool $is_active): void
     {
-        $this->isActive = $isActive;
+        $this->is_active = $is_active;
+    }
+
+    /**
+     * @param array $data
+     * @return Post|null
+     */
+    public static function createFromDatabase(array $data): ?Post
+    {
+        if (!$data) {
+            return null;
+        }
+        $createdAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['created_at']);
+        $updateAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['updated_at']);
+        return new self(
+            $data['id'],
+            $data['title'],
+            $data['slug'],
+            $data['thumbnail'],
+            $data['hat'],
+            $data['content'],
+            $createdAt,
+            $updateAt,
+            $data['is_active'],
+            $data['user_id'],
+        );
     }
 }

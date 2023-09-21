@@ -7,6 +7,7 @@ use App\Entity\Post;
 use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
 use App\Repository\UserRepository;
+use DateTimeImmutable;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +27,9 @@ class AdminController extends AbstractController
     }
 
     /**
+     * Liste tous les articles en tant qu'administrateur.
+     *
+     * @return Response
      * @throws SyntaxError
      * @throws RuntimeError
      * @throws LoaderError
@@ -43,8 +47,11 @@ class AdminController extends AbstractController
     }
 
 
-
     /**
+     * Éditer un article en tant qu'administrateur.
+     *
+     * @param Request $request
+     * @return Response
      * @throws SyntaxError
      * @throws RuntimeError
      * @throws LoaderError
@@ -73,11 +80,14 @@ class AdminController extends AbstractController
                     } elseif ($postRepository->isSlugIsTaken($slug, true)) {
                         $errorMessage = 'Un article possède deja ce titre';
                     } else {
-                        $updated_post = new Post($title, $post->getSlug(), $thumbnail, $hat, $content, $post->getCreatedAt(), new \DateTimeImmutable(), $post->isActive(), $post->getAuthorId(), $post->getId());
-
-                        $postRepository->updatePost($updated_post);
+                        $post->setTitle($title);
+                        $post->setSlug($slug);
+                        $post->setHat($hat);
+                        $post->setThumbnail($thumbnail);
+                        $post->setContent($content);
+                        $post->setUpdatedAt(new DateTimeImmutable());
+                        $postRepository->updatePost($post);
                         $successMessage = 'Article modifié avec succès';
-                        $post = $updated_post;
                     }
                 }
             } else {
@@ -94,8 +104,12 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @throws RuntimeError
+     * Ajouter un nouvel article en tant qu'administrateur.
+     *
+     * @param Request $request
+     * @return Response
      * @throws SyntaxError
+     * @throws RuntimeError
      * @throws LoaderError
      */
     public function addPost(Request $request): Response
@@ -122,9 +136,9 @@ class AdminController extends AbstractController
                 $post->setThumbnail($thumbnail);
                 $post->setHat($hat);
                 $post->setContent($content);
-                $post->setAuthorId(9);
-                $post->setCreatedAt(new \DateTimeImmutable());
-                $post->setUpdatedAt(new \DateTimeImmutable());
+                $post->setUserId(9);
+                $post->setCreatedAt(new DateTimeImmutable());
+                $post->setUpdatedAt(new DateTimeImmutable());
                 $post->setIsActive(true);
                 $postRepository->createPost($post);
                 $successMessage = 'Article ajouté avec succès';
@@ -136,6 +150,11 @@ class AdminController extends AbstractController
         ]);
     }
 
+    /**
+     * Vérifie si un utilisateur est connecté en tant qu'administrateur.
+     *
+     * @return bool
+     */
     private function isUserLoggedInAdmin(): bool
     {
         $userData = $this->session->get('user');
@@ -144,6 +163,10 @@ class AdminController extends AbstractController
 
 
     /**
+     *  Ajouter un nouvel article en tant qu'administrateur.
+     *
+     * @param Request $request
+     * @return Response
      * @throws SyntaxError
      * @throws RuntimeError
      * @throws LoaderError
@@ -176,6 +199,10 @@ class AdminController extends AbstractController
     }
 
     /**
+     * Inverse le statut d'un article en tant qu'administrateur.
+     *
+     * @param Request $request
+     * @return Response
      * @throws SyntaxError
      * @throws RuntimeError
      * @throws LoaderError
@@ -210,40 +237,11 @@ class AdminController extends AbstractController
         ]);
     }
 
-
     /**
-     * @throws SyntaxError
-     * @throws RuntimeError
-     * @throws LoaderError
-     * @throws Exception
-     */
-    public function listComments(Request $request): Response
-    {
-        $this->redirectIfNotAdmin();
-
-        $commentRepository = new CommentRepository();
-        $postRepository = new PostRepository();
-        $userRepository = new UserRepository();
-        $comments = array_reverse($commentRepository->getAllComments());
-        $successMessage = $this->getSuccessMessage($request);
-        $errorMessage = $this->getErrorMessage($request);
-        $arrayAuthor = array();
-        /** @var Comment $comment */
-        foreach ($comments as $comment) {
-            $arrayAuthor[$comment->getId()] = $userRepository->getUserById($comment->getAuthorId())->getUsername();
-        }
-        $content = $this->twig->render('app/admin/list-comments.html.twig', [
-            'comments' => $comments,
-            'postRepository' => $postRepository,
-            'message_success' => $successMessage,
-            'message_error' => $errorMessage,
-            'arrayAuthor' => $arrayAuthor
-        ]);
-        return new Response($content);
-    }
-
-
-    /**
+     * Liste tous les utilisateurs en tant qu'administrateur.
+     *
+     * @param Request $request
+     * @return Response
      * @throws SyntaxError
      * @throws RuntimeError
      * @throws LoaderError
@@ -265,9 +263,14 @@ class AdminController extends AbstractController
     }
 
     /**
+     * Inverse le rôle d'un utilisateur en tant qu'administrateur.
+     *
+     * @param Request $request
+     * @return Response
      * @throws SyntaxError
      * @throws RuntimeError
      * @throws LoaderError
+     *
      */
     public function swapUserRole(Request $request): Response
     {
@@ -299,6 +302,10 @@ class AdminController extends AbstractController
     }
 
     /**
+     * Inverse l'état d'activité d'un utilisateur en tant qu'administrateur.
+     *
+     * @param Request $request
+     * @return Response
      * @throws SyntaxError
      * @throws RuntimeError
      * @throws LoaderError
@@ -332,6 +339,12 @@ class AdminController extends AbstractController
         return new Response($content);
     }
 
+    /**
+     * Récupère un message de succès à afficher.
+     *
+     * @param Request $request
+     * @return string|null
+     */
     public function getSuccessMessage(Request $request): string|null
     {
         if ($request->isMethod('GET') && $request->query->has('comment_id')) {
@@ -341,6 +354,12 @@ class AdminController extends AbstractController
         }
     }
 
+    /**
+     * Récupère un message d'erreur à afficher.
+     *
+     * @param Request $request
+     * @return string|null
+     */
     public function getErrorMessage(Request $request): string|null
     {
         if ($request->isMethod('GET') && $request->query->has('comment_id')) {
@@ -351,6 +370,45 @@ class AdminController extends AbstractController
     }
 
     /**
+     * Liste tous les commentaires en tant qu'administrateur.
+     *
+     * @param Request $request
+     * @return Response
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     * @throws Exception
+     */
+    public function listComments(Request $request): Response
+    {
+        $this->redirectIfNotAdmin();
+
+        $commentRepository = new CommentRepository();
+        $postRepository = new PostRepository();
+        $userRepository = new UserRepository();
+        $comments = array_reverse($commentRepository->getAllComments());
+        $successMessage = $this->getSuccessMessage($request);
+        $errorMessage = $this->getErrorMessage($request);
+        $arrayAuthor = array();
+        /** @var Comment $comment */
+        foreach ($comments as $comment) {
+            $arrayAuthor[$comment->getId()] = $userRepository->getUserById($comment->getAuthorId())->getUsername();
+        }
+        $content = $this->twig->render('app/admin/list-comments.html.twig', [
+            'comments' => $comments,
+            'postRepository' => $postRepository,
+            'message_success' => $successMessage,
+            'message_error' => $errorMessage,
+            'arrayAuthor' => $arrayAuthor
+        ]);
+        return new Response($content);
+    }
+
+    /**
+     * Supprime un commentaire en tant qu'administrateur.
+     *
+     * @param Request $request
+     * @return Response
      * @throws RuntimeError
      * @throws SyntaxError
      * @throws LoaderError
@@ -374,7 +432,7 @@ class AdminController extends AbstractController
             }
         }
 
-        $comments = $commentRepository->getAllComments();
+        $comments = array_reverse($commentRepository->getAllComments());
 
         return $this->render('app/admin/list-comments.html.twig', [
             'comments' => $comments,
@@ -385,6 +443,10 @@ class AdminController extends AbstractController
 
 
     /**
+     * Approuve ou désapprouve un commentaire en tant qu'administrateur.
+     *
+     * @param Request $request
+     * @return Response
      * @throws SyntaxError
      * @throws RuntimeError
      * @throws LoaderError
@@ -413,7 +475,7 @@ class AdminController extends AbstractController
             }
         }
 
-        $comments = $commentRepository->getAllComments();
+        $comments = array_reverse($commentRepository->getAllComments());
 
         return $this->render('app/admin/list-comments.html.twig', [
             'comments' => $comments,
@@ -423,9 +485,14 @@ class AdminController extends AbstractController
     }
 
 
+    /**
+     * Redirige vers la page d'accueil si l'utilisateur n'est pas un administrateur.
+     *
+     * @return void
+     */
     private function redirectIfNotAdmin(): void
     {
-        if (!$this->isUserLoggedInAdmin()){
+        if (!$this->isUserLoggedInAdmin()) {
             header('Location: https://projet5.matteo-groult.com/');
         }
     }

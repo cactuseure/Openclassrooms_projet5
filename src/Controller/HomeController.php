@@ -2,23 +2,26 @@
 
 namespace App\Controller;
 
-use App\Repository\PostRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
+/**
+ * Contrôleur pour la page d'accueil du site.
+ */
 class HomeController extends AbstractController
 {
-    private PostRepository $postRepository;
 
     public function __construct()
     {
         parent::__construct();
-        $this->postRepository = new PostRepository();
     }
 
     /**
+     * Affiche la page d'accueil du site.
+     *
+     * @return Response
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
@@ -27,37 +30,4 @@ class HomeController extends AbstractController
     {
         return $this->render('app/home/index.html.twig');
     }
-
-    /**
-     * @param string $slug
-     * @return Response
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
-     */
-    public function show(string $slug): Response
-    {
-        $post = $this->postRepository->findBySlug($slug);
-
-        if (!$post) {
-            return $this->redirectToRoute('articles');
-        }
-
-        return $this->render('app/home/show.html.twig', ['post' => $post]);
-    }
-
-    /**
-     * @param string $slug
-     * @return Response
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
-     */
-    public function contact(): Response
-    {
-
-    }
-
-
-
 }

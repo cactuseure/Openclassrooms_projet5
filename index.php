@@ -7,9 +7,21 @@ $dotenv->load();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+use App\Controller\AdminController;
+use App\Controller\CommentController;
+use App\Controller\ContactController;
+use App\Controller\HomeController;
+use App\Controller\PostController;
+use App\Controller\UserController;
+use App\Repository\CommentRepository;
+use App\Repository\ContactMessageRepository;
+use App\Repository\PostRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 // Créez une instance de Session
 $session = new Session();
@@ -21,16 +33,16 @@ $request = Request::createFromGlobals();
 // Obtient l'URL demandée à partir de la requête
 $url = $request->getPathInfo();
 
-$commentRepository = new \App\Repository\CommentRepository();
-$postRepository = new \App\Repository\PostRepository();
-$contactMessageRepository = new \App\Repository\ContactMessageRepository();
+$commentRepository = new CommentRepository();
+$postRepository = new PostRepository();
+$contactMessageRepository = new ContactMessageRepository();
 
-$homeController = new \App\Controller\HomeController();
-$postController = new \App\Controller\PostController();
-$userController = new \App\Controller\UserController($session);
-$adminController = new \App\Controller\AdminController($session);
-$contactController = new \App\Controller\ContactController($contactMessageRepository);
-$commentController = new \App\Controller\CommentController($commentRepository, $postRepository, $session);
+$homeController = new HomeController();
+$postController = new PostController();
+$userController = new UserController($session);
+$adminController = new AdminController($session);
+$contactController = new ContactController($contactMessageRepository);
+$commentController = new CommentController($commentRepository, $postRepository, $session);
 
 // Récupère les données POST et GET
 $postData = $request->request->all();
@@ -78,7 +90,7 @@ if (isset($routes[$url])) {
     $slug = substr($url, strlen('/article/'));
     try {
         $response = $postController->show($slug, $request);
-    } catch (\Twig\Error\LoaderError|\Twig\Error\RuntimeError|\Twig\Error\SyntaxError $e) {
+    } catch (LoaderError|RuntimeError|SyntaxError $e) {
         $response = new Response('Internal Server Error', 500);
     }
 } else {
@@ -87,7 +99,7 @@ if (isset($routes[$url])) {
 }
 
 if (!$response instanceof Response) {
-    throw new \RuntimeException('The controller action must return an instance of Response.');
+    throw new RuntimeException('The controller action must return an instance of Response.');
 }
 
 // Envoie la réponse au client

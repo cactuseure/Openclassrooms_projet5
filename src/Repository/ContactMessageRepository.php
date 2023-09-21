@@ -1,5 +1,4 @@
 <?php
-// ContactMessageRepository.php
 
 namespace App\Repository;
 
@@ -7,6 +6,9 @@ use App\Core\Db;
 use App\Entity\ContactMessage;
 use PDO;
 
+/**
+ * Classe de gestion des messages de contact en base de données.
+ */
 class ContactMessageRepository
 {
     private PDO $db;
@@ -16,6 +18,12 @@ class ContactMessageRepository
         $this->db = Db::getInstance();
     }
 
+    /**
+     * Enregistre un message de contact dans la base de données.
+     *
+     * @param ContactMessage $contactMessage Le message de contact à enregistrer.
+     * @return bool true si l'enregistrement a réussi, sinon false.
+     */
     public function saveContactMessage(ContactMessage $contactMessage): bool
     {
         $sql = "INSERT INTO contact_messages (name, lastname, email, message, created_at)
