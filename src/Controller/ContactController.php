@@ -67,12 +67,12 @@ class ContactController extends AbstractController
 
             if (count($errors) === 0) {
 
-                $contactMessage = new ContactMessage();
-                $contactMessage->setName($name);
-                $contactMessage->setLastname($lastname);
-                $contactMessage->setEmail($email);
-                $contactMessage->setMessage($messageContent);
-                $contactMessage->setCreatedAt(new DateTimeImmutable());
+                $contactMessage = (new ContactMessage())
+                ->setName($name)
+                ->setLastname($lastname)
+                ->setEmail($email)
+                ->setMessage($messageContent)
+                ->setCreatedAt(new DateTimeImmutable());
 
 
                 $recipientEmail = $_ENV['CONTACT_EMAIL'];

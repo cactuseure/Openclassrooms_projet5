@@ -115,7 +115,6 @@ class AdminController extends AbstractController
     public function addPost(Request $request): Response
     {
         $this->redirectIfNotAdmin();
-
         $successMessage = null;
         $errorMessage = null;
         if ($request->isMethod('POST')) {
@@ -130,16 +129,16 @@ class AdminController extends AbstractController
             } elseif ($postRepository->isSlugIsTaken($slug)) {
                 $errorMessage = 'Ce titre d\'article est déjà utilisé';
             } else {
-                $post = new Post();
-                $post->setTitle($title);
-                $post->setSlug($slug);
-                $post->setThumbnail($thumbnail);
-                $post->setHat($hat);
-                $post->setContent($content);
-                $post->setUserId(9);
-                $post->setCreatedAt(new DateTimeImmutable());
-                $post->setUpdatedAt(new DateTimeImmutable());
-                $post->setIsActive(true);
+                $post = (new Post())
+                ->setTitle($title)
+                ->setSlug($slug)
+                ->setThumbnail($thumbnail)
+                ->setHat($hat)
+                ->setContent($content)
+                ->setUserId($this->session->get('user')['id'])
+                ->setCreatedAt(new DateTimeImmutable())
+                ->setUpdatedAt(new DateTimeImmutable())
+                ->setIsActive(true);
                 $postRepository->createPost($post);
                 $successMessage = 'Article ajouté avec succès';
             }
@@ -398,24 +397,10 @@ class AdminController extends AbstractController
         $this->redirectIfNotAdmin();
 
         $commentRepository = new CommentRepository();
-        $postRepository = new PostRepository();
-        $userRepository = new UserRepository();
-        $comments = array_reverse($commentRepository->getAllComments());
         $successMessage = $this->getSuccessMessage($request);
         $errorMessage = $this->getErrorMessage($request);
-        $arrayAuthor = array();
-        /** @var Comment $comment */
-        foreach ($comments as $comment) {
-            $arrayAuthor[$comment->getId()] = $userRepository->getUserById($comment->getAuthorId())->getUsername();
-        }
-        $content = $this->twig->render('app/admin/list-comments.html.twig', [
-            'comments' => $comments,
-            'postRepository' => $postRepository,
-            'message_success' => $successMessage,
-            'message_error' => $errorMessage,
-            'arrayAuthor' => $arrayAuthor
-        ]);
-        return new Response($content);
+
+        return $this->extracted($commentRepository, $successMessage, $errorMessage);
     }
 
     /**
@@ -436,8 +421,6 @@ class AdminController extends AbstractController
         $errorMessage = null;
 
         $commentRepository = new CommentRepository();
-        $postRepository = new PostRepository();
-        $userRepository = new UserRepository();
 
         if ($this->isUserLoggedInAdmin() && $request->isMethod('GET') && $request->query->has('comment_id')) {
             $comment_id = $request->query->get('comment_id');
@@ -448,19 +431,7 @@ class AdminController extends AbstractController
             }
         }
 
-        $comments = array_reverse($commentRepository->getAllComments());
-        $arrayAuthor = array();
-        /** @var Comment $comment */
-        foreach ($comments as $comment) {
-            $arrayAuthor[$comment->getId()] = $userRepository->getUserById($comment->getAuthorId())->getUsername();
-        }
-        return $this->render('app/admin/list-comments.html.twig', [
-            'comments' => $comments,
-            'postRepository' => $postRepository,
-            'message_success' => $successMessage,
-            'message_error' => $errorMessage,
-            'arrayAuthor' => $arrayAuthor
-        ]);
+        return $this->extracted($commentRepository, $successMessage, $errorMessage);
     }
 
 
@@ -481,8 +452,6 @@ class AdminController extends AbstractController
         $errorMessage = null;
 
         $commentRepository = new CommentRepository();
-        $postRepository = new PostRepository();
-        $userRepository = new UserRepository();
 
         if ($this->isUserLoggedInAdmin() && $request->isMethod('GET') && $request->query->has('comment_id')) {
             $comment_id = $request->query->get('comment_id');
@@ -499,19 +468,7 @@ class AdminController extends AbstractController
             }
         }
 
-        $comments = array_reverse($commentRepository->getAllComments());
-        $arrayAuthor = array();
-        /** @var Comment $comment */
-        foreach ($comments as $comment) {
-            $arrayAuthor[$comment->getId()] = $userRepository->getUserById($comment->getAuthorId())->getUsername();
-        }
-        return $this->render('app/admin/list-comments.html.twig', [
-            'comments' => $comments,
-            'postRepository' => $postRepository,
-            'message_success' => $successMessage,
-            'message_error' => $errorMessage,
-            'arrayAuthor' => $arrayAuthor
-        ]);
+        return $this->extracted($commentRepository, $successMessage, $errorMessage);
     }
 
 
@@ -525,6 +482,37 @@ class AdminController extends AbstractController
         if (!$this->isUserLoggedInAdmin()) {
             header('Location: https://projet5.matteo-groult.com/');
         }
+    }
+
+    /**
+     * @param CommentRepository $commentRepository
+     * @param null $successMessage
+     * @param string|null $errorMessage
+     * @return Response
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    public function extracted(CommentRepository $commentRepository, ?string $successMessage, ?string $errorMessage): Response
+    {
+        $postRepository = new PostRepository();
+        $userRepository = new UserRepository();
+        $comments = array_reverse($commentRepository->getAllComments());
+        $arrayAuthor = array();
+        $arrayPost = array();
+        /** @var Comment $comment */
+        foreach ($comments as $comment) {
+            $arrayAuthor[$comment->getId()] = $userRepository->getUserById($comment->getAuthorId())->getUsername();
+            $arrayPost[$comment->getId()] = $postRepository->getPostById($comment->getPostId())->getSlug();
+        }
+        return $this->render('app/admin/list-comments.html.twig', [
+            'comments' => $comments,
+            'postRepository' => $postRepository,
+            'message_success' => $successMessage,
+            'message_error' => $errorMessage,
+            'arrayAuthor' => $arrayAuthor,
+            'arrayPost' => $arrayPost
+        ]);
     }
 
 }

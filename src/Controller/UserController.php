@@ -70,15 +70,15 @@ class UserController extends AbstractController
                 } elseif ($existingUserName) {
                     $errorMessage = 'Un compte avec cet username existe déjà.';
                 } else {
-                    $user = new User();
-                    $user->setFirstName($firstName);
-                    $user->setLastName($lastName);
-                    $user->setEmail($email);
-                    $user->setUsername($username);
-                    $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
-                    $user->setRole('ROLE_USER');
-                    $user->setCreatedAt(new DateTimeImmutable());
-                    $user->setActive(false);
+                    $user = (new User())
+                    ->setFirstName($firstName)
+                    ->setLastName($lastName)
+                    ->setEmail($email)
+                    ->setUsername($username)
+                    ->setPassword(password_hash($password, PASSWORD_DEFAULT))
+                    ->setRole('ROLE_USER')
+                    ->setCreatedAt(new DateTimeImmutable())
+                    ->setActive(false);
                     $userRepository->createUser($user);
                     $successMessage = 'Inscription enregistré, en attende de validation';
                 }

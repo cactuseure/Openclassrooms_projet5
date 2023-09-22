@@ -71,11 +71,12 @@ class Comment
 
     /**
      * @param string $content
-     * @return void
+     * @return Comment
      */
-    public function setContent(string $content): void
+    public function setContent(string $content): self
     {
         $this->content = $content;
+        return $this;
     }
 
     /**
@@ -88,11 +89,12 @@ class Comment
 
     /**
      * @param int $user_id
-     * @return void
+     * @return Comment
      */
-    public function setAuthorId(int $user_id): void
+    public function setAuthorId(int $user_id): self
     {
         $this->user_id = $user_id;
+        return $this;
     }
 
     /**
@@ -105,11 +107,12 @@ class Comment
 
     /**
      * @param DateTimeImmutable $createdAt
-     * @return void
+     * @return Comment
      */
-    public function setCreatedAt(DateTimeImmutable $createdAt): void
+    public function setCreatedAt(DateTimeImmutable $createdAt): self
     {
         $this->created_at = $createdAt;
+        return $this;
     }
 
     /**
@@ -122,11 +125,12 @@ class Comment
 
     /**
      * @param int|null $parent_id
-     * @return void
+     * @return Comment
      */
-    public function setParentId(?int $parent_id): void
+    public function setParentId(?int $parent_id): self
     {
         $this->parent_id = $parent_id;
+        return $this;
     }
 
     /**
@@ -139,11 +143,12 @@ class Comment
 
     /**
      * @param int $post_id
-     * @return void
+     * @return Comment
      */
-    public function setPostId(int $post_id): void
+    public function setPostId(int $post_id): self
     {
         $this->post_id = $post_id;
+        return $this;
     }
 
     /**
@@ -156,11 +161,12 @@ class Comment
 
     /**
      * @param bool $is_approved
-     * @return void
+     * @return Comment
      */
-    public function setApproved(bool $is_approved): void
+    public function setApproved(bool $is_approved): self
     {
         $this->is_approved = $is_approved;
+        return $this;
     }
 
     /**

@@ -39,7 +39,7 @@
                 {% endif %}
                 {% if comments|length > 0 %}
                     {% for comment in comments %}
-                        {% if comment.getParentId() == null %}
+                        {% if comment.parentId == null %}
                             <div class="comment">
                                 <div class="user-banner">
                                     <div class="user">
@@ -47,7 +47,7 @@
                                             <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
                                                  alt="Avatar" class="img-fluid my-5" style="width: 80px;"/>
                                         </div>
-                                        <h5>{{ userRepository.getUserById(comment.getAuthorId()).getUsername() }}</h5>
+                                        <h5>{{ userRepository.getUserById(comment.authorId).username }}</h5>
                                     </div>
                                     <button class="btn dropdown"><i class="ri-more-line"></i></button>
                                 </div>
@@ -55,7 +55,7 @@
                                     {{ comment.content|raw }}
                                 </div>
                                 <div class="footer">
-                                    <span data-comment-id="{{ comment.getId() }}" class="reply_btn">Répondre</span>
+                                    <span data-comment-id="{{ comment.id }}" class="reply_btn">Répondre</span>
                                     <div class="divider"></div>
                                     <span class="is-mute">{% include 'app/post/_partials/_comment_date.html.twig' with {'comment': comment} %}</span>
                                 </div>
@@ -63,9 +63,9 @@
                             {% if comment.hasChildren() %}
                                 {% include 'app/post/_partials/_comment_form.html.twig' with {'post': post, 'commentId': comment.id} %}
                             {% endif %}
-                            {% for childComment in comment.getChildren() %}
+                            {% for childComment in comment.children %}
                                 {% set childComment = commentRepository.getCommentById(childComment) %}
-                                {% set authorChildComment = userRepository.getUserById(childComment.getAuthorId) %}
+                                {% set authorChildComment = userRepository.getUserById(childComment.authorId) %}
                                 <div class="reply comment">
                                     <div class="user-banner">
                                         <div class="user">

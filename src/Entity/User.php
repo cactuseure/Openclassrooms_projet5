@@ -192,10 +192,12 @@ class User
 
     /**
      * @param string|null $reset_token
+     * @return User
      */
-    public function setResetToken(?string $reset_token): void
+    public function setResetToken(?string $reset_token): self
     {
         $this->reset_token = $reset_token;
+        return $this;
     }
 
     /**
@@ -208,10 +210,12 @@ class User
 
     /**
      * @param DateTimeImmutable $created_at
+     * @return User
      */
-    public function setCreatedAt(DateTimeImmutable $created_at): void
+    public function setCreatedAt(DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
+        return $this;
     }
 
     /**
@@ -224,10 +228,12 @@ class User
 
     /**
      * @param bool $isActive
+     * @return User
      */
-    public function setActive(bool $isActive): void
+    public function setActive(bool $isActive): self
     {
         $this->is_active = $isActive;
+        return $this;
     }
 
 

@@ -27,7 +27,7 @@
                 <td>{{ user.lastName }}</td>
                 <td>{{ user.username }}</td>
                 <td>{{ user.email }}</td>
-                <td>{{ user.getCreatedAt()|date('d/m/Y H:i:s') }}</td>
+                <td>{{ user.createdAt|date('d/m/Y H:i:s') }}</td>
 
                 {% if user.role == 'ROLE_ADMIN' %}
                     <td class="user_role">administrateur

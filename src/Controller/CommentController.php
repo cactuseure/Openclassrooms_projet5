@@ -63,13 +63,13 @@ class CommentController extends AbstractController
                 $commentId = null;
             }
 
-            $comment = new Comment();
-            $comment->setContent($content);
-            $comment->setAuthorId($author);
-            $comment->setCreatedAt(new DateTimeImmutable());
-            $comment->setParentId($commentId);
-            $comment->setPostId($post->getId());
-            $comment->setApproved(false);
+            $comment = (new Comment())
+            ->setContent($content)
+            ->setAuthorId($author)
+            ->setCreatedAt(new DateTimeImmutable())
+            ->setParentId($commentId)
+            ->setPostId($post->getId())
+            ->setApproved(false);
 
             $this->commentRepository->createComment($comment);
             $successMessage = 'Commentaire enregistré (il sera visible après validation)';

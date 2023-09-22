@@ -60,11 +60,12 @@ class Post
 
     /**
      * @param $title
-     * @return void
+     * @return Post
      */
-    public function setTitle($title): void
+    public function setTitle($title): self
     {
         $this->title = $title;
+        return $this;
     }
 
     /**
@@ -77,11 +78,12 @@ class Post
 
     /**
      * @param $slug
-     * @return void
+     * @return Post
      */
-    public function setSlug($slug): void
+    public function setSlug($slug): self
     {
         $this->slug = $slug;
+        return $this;
     }
 
     /**
@@ -94,11 +96,12 @@ class Post
 
     /**
      * @param $thumbnail
-     * @return void
+     * @return Post
      */
-    public function setThumbnail($thumbnail): void
+    public function setThumbnail($thumbnail): self
     {
         $this->thumbnail = $thumbnail;
+        return $this;
     }
 
     /**
@@ -111,11 +114,12 @@ class Post
 
     /**
      * @param $hat
-     * @return void
+     * @return Post
      */
-    public function setHat($hat): void
+    public function setHat($hat): self
     {
         $this->hat = $hat;
+        return $this;
     }
 
     /**
@@ -128,11 +132,12 @@ class Post
 
     /**
      * @param $content
-     * @return void
+     * @return Post
      */
-    public function setContent($content): void
+    public function setContent($content): self
     {
         $this->content = $content;
+        return $this;
     }
 
     /**
@@ -145,11 +150,12 @@ class Post
 
     /**
      * @param DateTimeImmutable $createdAt
-     * @return void
+     * @return Post
      */
-    public function setCreatedAt(DateTimeImmutable $createdAt): void
+    public function setCreatedAt(DateTimeImmutable $createdAt): self
     {
         $this->created_at = $createdAt;
+        return $this;
     }
 
     /**
@@ -162,11 +168,12 @@ class Post
 
     /**
      * @param $updatedAt
-     * @return void
+     * @return Post
      */
-    public function setUpdatedAt($updatedAt): void
+    public function setUpdatedAt($updatedAt): self
     {
         $this->updated_at = $updatedAt;
+        return $this;
     }
 
     /**
@@ -179,11 +186,12 @@ class Post
 
     /**
      * @param $user_id
-     * @return void
+     * @return Post
      */
-    public function setUserId($user_id): void
+    public function setUserId($user_id): self
     {
         $this->user_id = $user_id;
+        return $this;
     }
 
     /**
@@ -196,11 +204,12 @@ class Post
 
     /**
      * @param bool $is_active
-     * @return void
+     * @return Post
      */
-    public function setIsActive(bool $is_active): void
+    public function setIsActive(bool $is_active): self
     {
         $this->is_active = $is_active;
+        return $this;
     }
 
     /**

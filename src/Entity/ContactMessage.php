@@ -38,56 +38,61 @@ class ContactMessage
     }
 
     /**
+     * @param string|null $name
+     * @return ContactMessage
+     */
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @param string|null $lastname
+     * @return ContactMessage
+     */
+    public function setLastname(?string $lastname): self
+    {
+        $this->lastname = $lastname;
+        return $this;
+    }
+
+    /**
+     * @param string|null $email
+     * @return ContactMessage
+     */
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+        return $this;
+    }
+
+    /**
+     * @param string|null $message
+     * @return ContactMessage
+     */
+    public function setMessage(?string $message): self
+    {
+        $this->message = $message;
+        return $this;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $createdAt
+     * @return ContactMessage
+     */
+    public function setCreatedAt(?DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getName(): string
     {
         return $this->name;
-    }
-
-    /**
-     * @param string|null $name
-     * @return void
-     */
-    public function setName(?string $name): void
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * @param string|null $lastname
-     * @return void
-     */
-    public function setLastname(?string $lastname): void
-    {
-        $this->lastname = $lastname;
-    }
-
-    /**
-     * @param string|null $email
-     * @return void
-     */
-    public function setEmail(?string $email): void
-    {
-        $this->email = $email;
-    }
-
-    /**
-     * @param string|null $message
-     * @return void
-     */
-    public function setMessage(?string $message): void
-    {
-        $this->message = $message;
-    }
-
-    /**
-     * @param DateTimeImmutable|null $createdAt
-     * @return void
-     */
-    public function setCreatedAt(?DateTimeImmutable $createdAt): void
-    {
-        $this->createdAt = $createdAt;
     }
 
     /**

@@ -25,9 +25,9 @@
             <tr>
                 <td>{{ comment.content|raw }}</td>
                 <td>{{ arrayAuthor[comment.id] }}</td>
-                <td>le {{ comment.getcreatedAt|date('d/m') }} à {{ comment.getcreatedAt|date('H') }}h{{ comment.getcreatedAt|date('i') }}</td>
+                <td>le {{ comment.createdAt|date('d/m') }} à {{ comment.createdAt|date('H') }}h{{ comment.createdAt|date('i') }}</td>
                 <td>
-                    <a href="/article/{{ postRepository.getPostById(comment.getPostId()).slug }}" target="_blank">
+                    <a href="/article/{{ arrayPost[comment.id] }}" target="_blank">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="25px" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/>
                         </svg>
