@@ -41,7 +41,7 @@ Importez le fichier SQL `install.sql` situé dans le répertoire `sql/` pour ini
 
 ### 5. Lancer l'application
 Vous pouvez maintenant lancer votre application. Assurez-vous que votre serveur web est configuré pour pointer vers le répertoire de votre projet.
-## Contributing
+## Contribution
 
 Si vous souhaitez contribuer à ce projet, veuillez suivre les étapes suivantes :
 
