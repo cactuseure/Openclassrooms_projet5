@@ -178,15 +178,28 @@ class AdminController extends AbstractController
         $successMessage = null;
         $errorMessage = null;
         $postRepository = new PostRepository();
+        $commentRepository = new CommentRepository();
+
         if ($request->query->has('post_id')) {
-            $post = $postRepository->getPostById($request->query->get('post_id'));
+            $postId = $request->query->get('post_id');
+            $post = $postRepository->getPostById($postId);
             if ($post) {
-                if ($postRepository->deletePost($request->query->get('post_id'))) {
+
+                $commentsToDelete = $commentRepository->getCommentsByPostId($postId);
+                foreach ($commentsToDelete as $comment) {
+                    $commentRepository->deleteComment($comment->getId());
+                }
+
+                if ($postRepository->deletePost($postId)) {
                     $successMessage = 'Article : "' . $post->getTitle() . '" a été supprimé avec succès.';
                 } else {
-                    $errorMessage = ' Erreur lors de la suppression';
+                    $errorMessage = 'Erreur lors de la suppression de l\'article';
                 }
+            } else {
+                $errorMessage = 'Article introuvable';
             }
+        } else {
+            $errorMessage = 'Article introuvable';
         }
 
         $posts = $postRepository->getAllPosts();
@@ -197,6 +210,7 @@ class AdminController extends AbstractController
             'message_error' => $errorMessage
         ]);
     }
+
 
     /**
      * Inverse le statut d'un article en tant qu'administrateur.
@@ -422,6 +436,8 @@ class AdminController extends AbstractController
         $errorMessage = null;
 
         $commentRepository = new CommentRepository();
+        $postRepository = new PostRepository();
+        $userRepository = new UserRepository();
 
         if ($this->isUserLoggedInAdmin() && $request->isMethod('GET') && $request->query->has('comment_id')) {
             $comment_id = $request->query->get('comment_id');
@@ -433,11 +449,17 @@ class AdminController extends AbstractController
         }
 
         $comments = array_reverse($commentRepository->getAllComments());
-
+        $arrayAuthor = array();
+        /** @var Comment $comment */
+        foreach ($comments as $comment) {
+            $arrayAuthor[$comment->getId()] = $userRepository->getUserById($comment->getAuthorId())->getUsername();
+        }
         return $this->render('app/admin/list-comments.html.twig', [
             'comments' => $comments,
+            'postRepository' => $postRepository,
             'message_success' => $successMessage,
-            'message_error' => $errorMessage
+            'message_error' => $errorMessage,
+            'arrayAuthor' => $arrayAuthor
         ]);
     }
 
@@ -459,6 +481,8 @@ class AdminController extends AbstractController
         $errorMessage = null;
 
         $commentRepository = new CommentRepository();
+        $postRepository = new PostRepository();
+        $userRepository = new UserRepository();
 
         if ($this->isUserLoggedInAdmin() && $request->isMethod('GET') && $request->query->has('comment_id')) {
             $comment_id = $request->query->get('comment_id');
@@ -476,11 +500,17 @@ class AdminController extends AbstractController
         }
 
         $comments = array_reverse($commentRepository->getAllComments());
-
+        $arrayAuthor = array();
+        /** @var Comment $comment */
+        foreach ($comments as $comment) {
+            $arrayAuthor[$comment->getId()] = $userRepository->getUserById($comment->getAuthorId())->getUsername();
+        }
         return $this->render('app/admin/list-comments.html.twig', [
             'comments' => $comments,
+            'postRepository' => $postRepository,
             'message_success' => $successMessage,
-            'message_error' => $errorMessage
+            'message_error' => $errorMessage,
+            'arrayAuthor' => $arrayAuthor
         ]);
     }
 

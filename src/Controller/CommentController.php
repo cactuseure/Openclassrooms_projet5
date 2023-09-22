@@ -59,13 +59,11 @@ class CommentController extends AbstractController
             if (!$post) {
                 return new Response('Post not found', Response::HTTP_NOT_FOUND);
             }
-
-            if ($commentId === 'new') {
+            if ($commentId == 0) {
                 $commentId = null;
             }
 
             $comment = new Comment();
-
             $comment->setContent($content);
             $comment->setAuthorId($author);
             $comment->setCreatedAt(new DateTimeImmutable());

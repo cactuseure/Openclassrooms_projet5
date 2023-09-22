@@ -177,7 +177,6 @@ class PostRepository
     public function deletePost(int $postId): bool
     {
         $db = Db::getInstance();
-
         $sql = "DELETE FROM post WHERE id = :id";
 
         $stmt = $db->prepare($sql);
