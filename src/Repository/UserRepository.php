@@ -208,7 +208,7 @@ class UserRepository
         $users = [];
         foreach ($results as $data) {
             $user = User::createFromDatabase($data);
-            $users[] = $user;
+            $users[$user->getId()] = $user;
         }
         return $users;
     }

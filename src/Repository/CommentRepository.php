@@ -51,7 +51,7 @@ class CommentRepository
         $comments = [];
         foreach ($results as $data) {
             $comment = Comment::createFromDatabase($data);
-            $comments[] = $comment;
+            $comments[$comment->getId()] = $comment;
         }
         return $comments;
     }
@@ -70,7 +70,7 @@ class CommentRepository
         $comments = [];
         foreach ($results as $data) {
             $comment = Comment::createFromDatabase($data);
-            $comments[] = $comment;
+            $comments[$comment->getId()] = $comment;
         }
         return $comments;
     }

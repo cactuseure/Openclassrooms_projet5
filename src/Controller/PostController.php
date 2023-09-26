@@ -55,15 +55,17 @@ class PostController extends AbstractController
         $errorMessage = null;
         $userRepository = new UserRepository();
         $commentRepository = new CommentRepository();
+
         $post = $this->postRepository->findBySlug($slug);
         if (!$post) {
             return new Response('Post not found', Response::HTTP_NOT_FOUND);
         }
-
+        $users = $userRepository->getUsers();
         $comments = $this->commentRepository->getCommentsByPostId($post->getId());
         $content = $this->twig->render('app/post/show.html.twig', [
             'post' => $post,
             'comments' => $comments,
+            'users' => $users,
             'message_success' => $successMessage,
             'message_error' => $errorMessage,
             'userRepository' => $userRepository,

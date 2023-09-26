@@ -8,6 +8,7 @@
     <script src="/assets/js/comments.js"></script>
 {% endblock javascripts %}
 {% block body %}
+
     <div class="post-image">
         <img src="{{ post.thumbnail }}" alt="{{ post.title }}" class="img-fluid">
         <div class="post-title-container">
@@ -47,7 +48,7 @@
                                             <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
                                                  alt="Avatar" class="img-fluid my-5" style="width: 80px;"/>
                                         </div>
-                                        <h5>{{ userRepository.getUserById(comment.authorId).username }}</h5>
+                                        <h5>{{ users[comment.authorId].username }}</h5>
                                     </div>
                                     <button class="btn dropdown"><i class="ri-more-line"></i></button>
                                 </div>
@@ -64,8 +65,8 @@
                                 {% include 'app/post/_partials/_comment_form.html.twig' with {'post': post, 'commentId': comment.id} %}
                             {% endif %}
                             {% for childComment in comment.children %}
-                                {% set childComment = commentRepository.getCommentById(childComment) %}
-                                {% set authorChildComment = userRepository.getUserById(childComment.authorId) %}
+                                {% set childComment = comments[childComment] %}
+                                {% set authorChildComment = users[childComment.authorId] %}
                                 <div class="reply comment">
                                     <div class="user-banner">
                                         <div class="user">
