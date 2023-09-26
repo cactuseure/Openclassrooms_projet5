@@ -50,6 +50,10 @@ class ContactController extends AbstractController
             $lastname = $request->request->get('lastname');
             $email = $request->request->get('email');
             $messageContent = $request->request->get('message');
+            $firstNumber = $request->request->get('first_number');
+            $secondNumber = $request->request->get('second_number');
+            $userAnswer = $request->request->get('math_question');
+            $expectedAnswer = $firstNumber + $secondNumber;
 
             $errors = [];
 
@@ -67,6 +71,10 @@ class ContactController extends AbstractController
 
             if (empty($messageContent)) {
                 $errors['message'] = 'Veuillez entrer votre message.';
+            }
+
+            if (empty($userAnswer) || (intval($userAnswer) !== $expectedAnswer)) {
+                $errors['math_question'] = 'La réponse à la question mathématique est incorrecte.';
             }
 
             if (count($errors) === 0) {
@@ -105,6 +113,8 @@ class ContactController extends AbstractController
             'message_success' => $successMessage,
             'message_error' => $errorMessage,
             'errors' => $errors,
+            'first_number' => rand(3, 15),
+            'second_number' => rand(3, 15)
         ]);
     }
 }

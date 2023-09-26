@@ -35,6 +35,15 @@
                     <div class="alert alert-danger">{{ errors.message }}</div>
                 {% endif %}
             </div>
+            <div class="form-group">
+                <label for="math_question">Question mathématique : Combien font {{ first_number }} + {{ second_number }} ?</label>
+                <input type="number" class="form-control" id="math_question" name="math_question" required>
+                <input type="hidden" name="first_number" value="{{ first_number }}">
+                <input type="hidden" name="second_number" value="{{ second_number }}">
+            </div>
+            {% if errors.math_question %}
+                <div class="alert alert-danger">{{ errors.math_question }}</div>
+            {% endif %}
             {% if message_success %}
                 <div class="alert alert-success">{{ message_success }}</div>
             {% endif %}
