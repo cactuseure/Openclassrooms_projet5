@@ -1,7 +1,6 @@
 window.addEventListener("DOMContentLoaded", () => {
     const replyButtons = document.querySelectorAll(".reply_btn");
-
-    setTimeout(function () {
+    setTimeout(function() {
         replyButtons.forEach((button) => {
             button.addEventListener('click', () => {
                 let commentId = button.dataset.commentId;
