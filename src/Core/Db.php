@@ -31,6 +31,7 @@ class Db
             self::$instance = new PDO($dsn, $username, $password);
             self::$instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
+
         return self::$instance;
     }
 }

@@ -48,10 +48,10 @@ Si vous souhaitez contribuer à ce projet, veuillez suivre les étapes suivantes
 Fork du dépôt sur GitHub.
 Clonez votre fork sur votre machine locale.
 Créez une branche pour votre contribution :
-- git checkout -b ma-contribution.
-- Faites vos modifications et committez-les : git commit -m "Ajout de fonctionnalité X".
-- Poussez votre branche vers votre fork : git push origin ma-contribution.
-- Créez une pull request depuis votre fork vers ce dépôt principal.
+  - git checkout -b ma-contribution.
+  - Faites vos modifications et committez-les : git commit -m "Ajout de fonctionnalité X".
+  - Poussez votre branche vers votre fork : git push origin ma-contribution.
+  - Créez une pull request depuis votre fork vers ce dépôt principal.
 
 ## Licence
 

@@ -19,8 +19,20 @@ use Twig\Error\SyntaxError;
  */
 class CommentController extends AbstractController
 {
+
+    /**
+     * @var CommentRepository
+     */
     private CommentRepository $commentRepository;
+
+    /**
+     * @var PostRepository
+     */
     private PostRepository $postRepository;
+
+    /**
+     * @var SessionInterface
+     */
     protected SessionInterface $session;
 
     public function __construct(
@@ -88,6 +100,7 @@ class CommentController extends AbstractController
         $errorMessage = 'Error: Unable to post the comment.';
         $post = $this->postRepository->getPostById($postId);
         if (!$post) {
+
             return new Response('Post not found', Response::HTTP_NOT_FOUND);
         }
         $comments = $this->commentRepository->getCommentsByPostId($post->getId());
@@ -99,6 +112,7 @@ class CommentController extends AbstractController
             'userRepository' => $userRepository,
             'commentRepository' => $commentRepository
         ]);
+
         return new Response($content);
     }
 
@@ -111,8 +125,10 @@ class CommentController extends AbstractController
     {
         $userData = $this->session->get('user');
         if (isset($userData['id'])) {
+
             return $userData['id'];
         }
+
         return 0;
     }
 }

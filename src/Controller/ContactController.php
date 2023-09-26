@@ -17,6 +17,10 @@ use Twig\Error\SyntaxError;
  */
 class ContactController extends AbstractController
 {
+
+    /**
+     * @var ContactMessageRepository
+     */
     private ContactMessageRepository $contactMessageRepository;
 
     public function __construct(ContactMessageRepository $contactMessageRepository)
@@ -96,7 +100,6 @@ class ContactController extends AbstractController
                 $errorMessage = 'Veuillez corriger les erreurs dans le formulaire.';
             }
         }
-
 
         return $this->render('app/home/contact.html.twig', [
             'message_success' => $successMessage,

@@ -9,11 +9,32 @@ use DateTimeImmutable;
  */
 class ContactMessage
 {
+
+    /**
+     * @var string|null
+     */
     private ?string $name;
+
+    /**
+     * @var string|null
+     */
     private ?string $lastname;
+
+    /**
+     * @var string|null
+     */
     private ?string $email;
+
+    /**
+     * @var string|null
+     */
     private ?string $message;
+
+    /**
+     * @var DateTimeImmutable|null
+     */
     private ?DateTimeImmutable $createdAt;
+
 
     /**
      * @param string|null $name
@@ -44,6 +65,7 @@ class ContactMessage
     public function setName(?string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -54,6 +76,7 @@ class ContactMessage
     public function setLastname(?string $lastname): self
     {
         $this->lastname = $lastname;
+
         return $this;
     }
 
@@ -64,6 +87,7 @@ class ContactMessage
     public function setEmail(?string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -74,6 +98,7 @@ class ContactMessage
     public function setMessage(?string $message): self
     {
         $this->message = $message;
+
         return $this;
     }
 
@@ -84,6 +109,7 @@ class ContactMessage
     public function setCreatedAt(?DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 

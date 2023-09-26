@@ -11,6 +11,10 @@ use PDO;
  */
 class PostRepository
 {
+
+    /**
+     * @var PDO|null
+     */
     private ?PDO $db;
 
     public function __construct()
@@ -33,6 +37,7 @@ class PostRepository
             $post = Post::createFromDatabase($data);
             $posts[] = $post;
         }
+
         return $posts;
     }
 
@@ -50,6 +55,7 @@ class PostRepository
             $post = Post::createFromDatabase($data);
             $posts[] = $post;
         }
+
         return $posts;
     }
 
@@ -65,8 +71,10 @@ class PostRepository
         $query->execute(['slug' => $slug]);
         $result = $query->fetch(PDO::FETCH_ASSOC);
         if (!$result) {
+
             return null;
         }
+
         return Post::createFromDatabase($result);
     }
 
@@ -84,6 +92,7 @@ class PostRepository
         if (!$result) {
             return null;
         }
+
         return Post::createFromDatabase($result);
     }
 
@@ -143,6 +152,7 @@ class PostRepository
         $stmt->bindValue(':is_active', $post->isActive());
         $stmt->bindValue(':user_id', $post->getUserId());
         $stmt->bindValue(':id', $post->getId());
+
         return $stmt->execute();
     }
 
@@ -161,10 +171,13 @@ class PostRepository
         $post = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($post) {
             if ($exceptHimself && $post['slug'] === $slug) {
+
                 return false;
             }
+
             return true;
         }
+
         return false;
     }
 
@@ -209,6 +222,7 @@ class PostRepository
     {
         $post = $this->getPostById($postId);
         if (!$post) {
+
             return false;
         }
 

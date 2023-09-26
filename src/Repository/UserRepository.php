@@ -13,6 +13,10 @@ use PDOStatement;
  */
 class UserRepository
 {
+
+    /**
+     * @var PDO|null
+     */
     private ?PDO $db;
 
     public function __construct()
@@ -32,6 +36,7 @@ class UserRepository
         try {
             $stmt = $this->db->prepare('INSERT INTO user (first_name, last_name, email, username, password, reset_token, role, created_at,is_active) VALUES (:first_name, :last_name, :email, :username, :password, :reset_token, :role, :created_at, :is_active)');
             $this->bindAllValue($stmt, $user);
+
             return $stmt->execute();
         } catch (PDOException $e) {
             throw new PDOException("Erreur lors de la création de l'utilisateur : " . $e->getMessage());
@@ -50,8 +55,10 @@ class UserRepository
         $query->execute(['email' => $email]);
         $result = $query->fetch(PDO::FETCH_ASSOC);
         if (!$result) {
+
             return null;
         }
+
         return User::createFromDatabase($result);
     }
 
@@ -67,8 +74,10 @@ class UserRepository
         $query->execute(['resetToken' => $resetToken]);
         $result = $query->fetch(PDO::FETCH_ASSOC);
         if (!$result) {
+
             return null;
         }
+
         return User::createFromDatabase($result);
     }
 
@@ -82,6 +91,7 @@ class UserRepository
     {
         $stmt = $this->db->prepare("UPDATE `user` SET `reset_token` = NULL WHERE `id` = :userId");
         $stmt->bindValue(':userId', $userId);
+
         return $stmt->execute();
     }
 
@@ -97,8 +107,10 @@ class UserRepository
         $query->execute(['id' => $id]);
         $result = $query->fetch(PDO::FETCH_ASSOC);
         if (!$result) {
+
             return null;
         }
+
         return User::createFromDatabase($result);
     }
 
@@ -132,10 +144,13 @@ class UserRepository
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($user) {
             if ($exceptHimself && $user['email'] === $sessionEmail) {
+
                 return false;
             }
+
             return true;
         }
+
         return false;
     }
 
@@ -155,10 +170,13 @@ class UserRepository
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($user) {
             if ($exceptHimself && $user['username'] === $sessionUsername) {
+
                 return false;
             }
+
             return true;
         }
+
         return false;
     }
 
@@ -175,6 +193,7 @@ class UserRepository
             $stmt = $this->db->prepare('UPDATE user SET first_name = :first_name, last_name = :last_name, email = :email, username = :username, password = :password, reset_token = :reset_token, role = :role, created_at = :created_at, is_active = :is_active WHERE id = :user_id');
             $this->bindAllValue($stmt, $user);
             $stmt->bindValue(':user_id', $user->getId());
+
             return $stmt->execute();
         } catch (PDOException $e) {
             throw new PDOException("Erreur lors de la mise à jour de l'utilisateur : " . $e->getMessage());
@@ -193,6 +212,7 @@ class UserRepository
         $stmt = $this->db->prepare("UPDATE `user` SET `password` = :newPassword WHERE `id` = :userId");
         $stmt->bindValue(':newPassword', $newPassword);
         $stmt->bindValue(':userId', $userId);
+
         return $stmt->execute();
     }
 
@@ -210,6 +230,7 @@ class UserRepository
             $user = User::createFromDatabase($data);
             $users[$user->getId()] = $user;
         }
+
         return $users;
     }
 
@@ -240,9 +261,9 @@ class UserRepository
      */
     public function swapRole(User $user): bool
     {
-        if ($user->getRole() == 'ROLE_ADMIN'){
+        if ($user->getRole() == 'ROLE_ADMIN') {
             $newRole = 'ROLE_USER';
-        }else{
+        } else {
             $newRole = 'ROLE_ADMIN';
         }
         $db = Db::getInstance();

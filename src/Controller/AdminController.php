@@ -18,6 +18,10 @@ use Twig\Error\SyntaxError;
 
 class AdminController extends AbstractController
 {
+
+    /**
+     * @var SessionInterface
+     */
     protected SessionInterface $session;
 
     public function __construct(SessionInterface $session)
@@ -96,6 +100,7 @@ class AdminController extends AbstractController
         } else {
             $errorMessage = 'article introuvable';
         }
+
         return $this->render('/app/admin/edit-post.html.twig', [
             'post' => $post,
             'message_success' => $successMessage,
@@ -143,6 +148,7 @@ class AdminController extends AbstractController
                 $successMessage = 'Article ajouté avec succès';
             }
         }
+
         return $this->render('/app/admin/add-post.html.twig', [
             'message_success' => $successMessage,
             'message_error' => $errorMessage
@@ -157,6 +163,7 @@ class AdminController extends AbstractController
     private function isUserLoggedInAdmin(): bool
     {
         $userData = $this->session->get('user');
+
         return ($userData !== null && $userData['role'] === 'administrateur');
     }
 
@@ -272,6 +279,7 @@ class AdminController extends AbstractController
             'message_success' => $successMessage,
             'message_error' => $errorMessage,
         ]);
+
         return new Response($content);
     }
 
@@ -311,6 +319,7 @@ class AdminController extends AbstractController
             'message_success' => $successMessage,
             'message_error' => $errorMessage,
         ]);
+
         return new Response($content);
     }
 
@@ -349,6 +358,7 @@ class AdminController extends AbstractController
             'message_success' => $successMessage,
             'message_error' => $errorMessage,
         ]);
+
         return new Response($content);
     }
 
@@ -361,8 +371,10 @@ class AdminController extends AbstractController
     public function getSuccessMessage(Request $request): string|null
     {
         if ($request->isMethod('GET') && $request->query->has('comment_id')) {
+
             return $request->query->get('comment_id');
         } else {
+
             return null;
         }
     }
@@ -376,8 +388,10 @@ class AdminController extends AbstractController
     public function getErrorMessage(Request $request): string|null
     {
         if ($request->isMethod('GET') && $request->query->has('comment_id')) {
+
             return $request->query->get('comment_id');
         } else {
+
             return null;
         }
     }
@@ -505,6 +519,7 @@ class AdminController extends AbstractController
             $arrayAuthor[$comment->getId()] = $userRepository->getUserById($comment->getAuthorId())->getUsername();
             $arrayPost[$comment->getId()] = $postRepository->getPostById($comment->getPostId())->getSlug();
         }
+
         return $this->render('app/admin/list-comments.html.twig', [
             'comments' => $comments,
             'postRepository' => $postRepository,

@@ -6,13 +6,45 @@ use DateTimeImmutable;
 
 class Comment
 {
+
+    /**
+     * @var int|null
+     */
     private ?int $id;
+
+    /**
+     * @var string|null
+     */
     private ?string $content;
+
+    /**
+     * @var int|null
+     */
     private ?int $user_id;
+
+    /**
+     * @var DateTimeImmutable|null
+     */
     private ?DateTimeImmutable $created_at;
+
+    /**
+     * @var int|null
+     */
     private ?int $parent_id;
+
+    /**
+     * @var int|null
+     */
     private ?int $post_id;
+
+    /**
+     * @var bool|null
+     */
     private ?bool $is_approved;
+
+    /**
+     * @var array|null
+     */
     private ?array $children;
 
     /**
@@ -76,6 +108,7 @@ class Comment
     public function setContent(string $content): self
     {
         $this->content = $content;
+
         return $this;
     }
 
@@ -94,6 +127,7 @@ class Comment
     public function setAuthorId(int $user_id): self
     {
         $this->user_id = $user_id;
+
         return $this;
     }
 
@@ -112,6 +146,7 @@ class Comment
     public function setCreatedAt(DateTimeImmutable $createdAt): self
     {
         $this->created_at = $createdAt;
+
         return $this;
     }
 
@@ -130,6 +165,7 @@ class Comment
     public function setParentId(?int $parent_id): self
     {
         $this->parent_id = $parent_id;
+
         return $this;
     }
 
@@ -148,6 +184,7 @@ class Comment
     public function setPostId(int $post_id): self
     {
         $this->post_id = $post_id;
+
         return $this;
     }
 
@@ -166,6 +203,7 @@ class Comment
     public function setApproved(bool $is_approved): self
     {
         $this->is_approved = $is_approved;
+
         return $this;
     }
 
@@ -192,6 +230,7 @@ class Comment
     public static function createFromDatabase(array $data): ?Comment
     {
         if (!$data) {
+
             return null;
         }
         $commentRepository = new CommentRepository();

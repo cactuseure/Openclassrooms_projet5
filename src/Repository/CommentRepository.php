@@ -11,6 +11,10 @@ use PDOStatement;
  */
 class CommentRepository
 {
+
+    /**
+     * @var PDO|null
+     */
     private ?PDO $db;
 
     public function __construct()
@@ -53,6 +57,7 @@ class CommentRepository
             $comment = Comment::createFromDatabase($data);
             $comments[$comment->getId()] = $comment;
         }
+
         return $comments;
     }
 
@@ -72,6 +77,7 @@ class CommentRepository
             $comment = Comment::createFromDatabase($data);
             $comments[$comment->getId()] = $comment;
         }
+
         return $comments;
     }
 
@@ -87,8 +93,10 @@ class CommentRepository
         $query->execute(['id' => $commentId]);
         $result = $query->fetch(PDO::FETCH_ASSOC);
         if (!$result) {
+
             return null;
         }
+
         return Comment::createFromDatabase($result);
     }
 
@@ -106,6 +114,7 @@ class CommentRepository
                 is_approved = :is_approved WHERE id = :id";
         $stmt = $this->getCommentByPDO($db, $sql, $comment);
         $stmt->bindValue(':id', $comment->getId());
+
         return $stmt->execute();
     }
 
@@ -121,6 +130,7 @@ class CommentRepository
         $sql = "DELETE FROM comments WHERE id = :id";
         $stmt = $db->prepare($sql);
         $stmt->bindValue(':id', $commentId);
+
         return $stmt->execute();
     }
 
@@ -136,12 +146,14 @@ class CommentRepository
         $query->execute(['parent_id' => $id]);
         $result = $query->fetchAll(PDO::FETCH_ASSOC);
         if (empty($result)) {
+
             return [];
         }
         $array = [];
         foreach ($result as $comment) {
             $array[] = $comment['id'];
         }
+
         return $array;
     }
 
@@ -162,6 +174,7 @@ class CommentRepository
         $stmt->bindValue(':parent_id', $comment->getParentId());
         $stmt->bindValue(':post_id', $comment->getPostId());
         $stmt->bindValue(':is_approved', $comment->isApproved());
+
         return $stmt;
     }
 }

@@ -6,17 +6,46 @@ use DateTimeImmutable;
 
 class User
 {
-    public const ROLE_USER = 'ROLE_USER';
-    public const ROLE_ADMIN = 'ROLE_ADMIN';
+
+    /**
+     * @var int|null
+     */
     private ?int $id;
+    /**
+     * @var string|null
+     */
     private ?string $firstName;
+    /**
+     * @var string|null
+     */
     private ?string $lastName;
+    /**
+     * @var string|null
+     */
     private ?string $email;
+    /**
+     * @var string|null
+     */
     private ?string $username;
+    /**
+     * @var string|null
+     */
     private ?string $password;
+    /**
+     * @var DateTimeImmutable|null
+     */
     private ?DateTimeImmutable $created_at;
+    /**
+     * @var string|null
+     */
     private ?string $role;
+    /**
+     * @var string|null
+     */
     private ?string $reset_token;
+    /**
+     * @var bool|null
+     */
     private ?bool $is_active;
 
     public function __construct(
@@ -59,6 +88,7 @@ class User
     public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
+
         return $this;
     }
 
@@ -77,6 +107,7 @@ class User
     public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -95,6 +126,7 @@ class User
     public function setFirstName(string $firstName): self
     {
         $this->firstName = $firstName;
+
         return $this;
     }
 
@@ -113,6 +145,7 @@ class User
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -131,6 +164,7 @@ class User
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
         return $this;
     }
 
@@ -161,6 +195,7 @@ class User
     public function setRole(string $role): self
     {
         $this->role = $role;
+
         return $this;
     }
 
@@ -179,6 +214,7 @@ class User
     public function setUsername(string $username): self
     {
         $this->username = $username;
+
         return $this;
     }
 
@@ -197,6 +233,7 @@ class User
     public function setResetToken(?string $reset_token): self
     {
         $this->reset_token = $reset_token;
+
         return $this;
     }
 
@@ -215,6 +252,7 @@ class User
     public function setCreatedAt(DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
+
         return $this;
     }
 
@@ -233,6 +271,7 @@ class User
     public function setActive(bool $isActive): self
     {
         $this->is_active = $isActive;
+
         return $this;
     }
 
@@ -244,9 +283,11 @@ class User
     public static function createFromDatabase(array $data): ?User
     {
         if (!$data) {
+
             return null;
         }
         $createdAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['created_at']);
+
         return new self(
             $data['id'],
             $data['first_name'],

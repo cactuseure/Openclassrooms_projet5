@@ -11,6 +11,10 @@ use PDO;
  */
 class ContactMessageRepository
 {
+
+    /**
+     * @var PDO|null
+     */
     private PDO $db;
 
     public function __construct()

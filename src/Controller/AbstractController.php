@@ -15,19 +15,30 @@ use Twig\Loader\FilesystemLoader;
 
 abstract class AbstractController
 {
-    protected Environment $twig;
-    protected SessionInterface $session;
 
+    /**
+     * @var Environment
+     */
+    protected Environment $twig;
+
+    /**
+     * @var Session|SessionInterface
+     */
+    protected SessionInterface|Session $session;
+
+    /**
+     * Constructeur de la classe.
+     * Initialise le moteur de template Twig, configure la session,
+     * et ajoute des extensions et des globales au moteur de template.
+     */
     public function __construct()
     {
-        // Configure le moteur de template Twig
         $loader = new FilesystemLoader(__DIR__ . '/../../templates');
         $this->twig = new Environment($loader, [
             'debug' => true,
         ]);
 
         $session = new Session();
-        //$session->start();
         $this->session = $session;
 
         $this->twig->addGlobal('session', $this->session->all());
@@ -59,6 +70,7 @@ abstract class AbstractController
     protected function redirectToRoute(string $route, array $parameters = []): RedirectResponse
     {
         $url = $this->generateUrl($route, $parameters);
+
         return new RedirectResponse($url);
     }
 
@@ -75,6 +87,7 @@ abstract class AbstractController
         if (!empty($parameters)) {
             $url .= '?' . http_build_query($parameters);
         }
+
         return $url;
     }
 }

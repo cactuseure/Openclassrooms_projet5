@@ -6,15 +6,55 @@ use DateTimeImmutable;
 
 class Post
 {
+
+    /**
+     * @var int|null
+     */
     private ?int $id;
+
+    /**
+     * @var string|null
+     */
     private ?string $title;
+
+    /**
+     * @var string|null
+     */
     private ?string $slug;
+
+    /**
+     * @var string|null
+     */
     private ?string $thumbnail;
+
+    /**
+     * @var string|null
+     */
     private ?string $hat;
+
+    /**
+     * @var string|null
+     */
     private ?string $content;
+
+    /**
+     * @var DateTimeImmutable|null
+     */
     private ?DateTimeImmutable $created_at;
+
+    /**
+     * @var DateTimeImmutable|null
+     */
     private ?DateTimeImmutable $updated_at;
+
+    /**
+     * @var bool|null
+     */
     private ?Bool $is_active;
+
+    /**
+     * @var int|null
+     */
     private ?int $user_id;
 
     public function __construct(
@@ -65,6 +105,7 @@ class Post
     public function setTitle($title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -83,6 +124,7 @@ class Post
     public function setSlug($slug): self
     {
         $this->slug = $slug;
+
         return $this;
     }
 
@@ -101,6 +143,7 @@ class Post
     public function setThumbnail($thumbnail): self
     {
         $this->thumbnail = $thumbnail;
+
         return $this;
     }
 
@@ -119,6 +162,7 @@ class Post
     public function setHat($hat): self
     {
         $this->hat = $hat;
+
         return $this;
     }
 
@@ -137,6 +181,7 @@ class Post
     public function setContent($content): self
     {
         $this->content = $content;
+
         return $this;
     }
 
@@ -155,6 +200,7 @@ class Post
     public function setCreatedAt(DateTimeImmutable $createdAt): self
     {
         $this->created_at = $createdAt;
+
         return $this;
     }
 
@@ -173,6 +219,7 @@ class Post
     public function setUpdatedAt($updatedAt): self
     {
         $this->updated_at = $updatedAt;
+
         return $this;
     }
 
@@ -191,6 +238,7 @@ class Post
     public function setUserId($user_id): self
     {
         $this->user_id = $user_id;
+
         return $this;
     }
 
@@ -209,6 +257,7 @@ class Post
     public function setIsActive(bool $is_active): self
     {
         $this->is_active = $is_active;
+
         return $this;
     }
 
@@ -219,10 +268,12 @@ class Post
     public static function createFromDatabase(array $data): ?Post
     {
         if (!$data) {
+
             return null;
         }
         $createdAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['created_at']);
         $updateAt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['updated_at']);
+
         return new self(
             $data['id'],
             $data['title'],

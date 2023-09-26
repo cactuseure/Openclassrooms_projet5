@@ -58,6 +58,7 @@ class PostController extends AbstractController
 
         $post = $this->postRepository->findBySlug($slug);
         if (!$post) {
+
             return new Response('Post not found', Response::HTTP_NOT_FOUND);
         }
         $users = $userRepository->getUsers();

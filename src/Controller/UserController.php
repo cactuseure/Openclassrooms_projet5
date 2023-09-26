@@ -220,6 +220,7 @@ class UserController extends AbstractController
                         'created_at' => $user->getCreatedAt(),
                         'is_connected' => true,
                     ]);
+
                     return $this->redirectToRoute('mon-compte',
                         [
                             'message-edit' => 'success'
@@ -228,6 +229,7 @@ class UserController extends AbstractController
                 }
             }
         }
+
         return $this->render('/app/user/edit-profil.html.twig',
             [
                 'error' => $error,
@@ -269,6 +271,7 @@ class UserController extends AbstractController
                 if ($user && password_verify($last_password, $user->getPassword())) {
                     $userRepository->changePasswordBy($user->getId(), password_hash($password, PASSWORD_DEFAULT));
                     $successMessage = 'Mot de passe modifié avec succès';
+
                     return $this->redirectToRoute('mon-compte', [
                         'message_success' => $successMessage,
                         'message_error' => $errorMessage
@@ -277,6 +280,7 @@ class UserController extends AbstractController
                 $errorMessage = 'L\'ancien mot de passe est incorrect';
             }
         }
+
         return $this->render('/app/user/edit-password.html.twig', [
             'message_success' => $successMessage,
             'message_error' => $errorMessage
@@ -390,6 +394,4 @@ class UserController extends AbstractController
             'message_error' => $errorMessage
         ]);
     }
-
-
 }
