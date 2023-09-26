@@ -373,10 +373,10 @@ class UserController extends AbstractController
                 $errorMessage = 'Les mots de passe ne correspondent pas.';
             } elseif (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password)) {
                 $errorMessage = 'Le mot de passe doit contenir au moins 8 caractères avec au moins une majuscule et une minuscule.';
-            } elseif (!$request->request->has('token')) {
+            } elseif (!$request->query->has('token')) {
                 $errorMessage = 'Token expiré';
             } else {
-                $token = $request->request->get('token');
+                $token = $request->query->get('token');
                 $userRepository = new UserRepository();
                 $user = $userRepository->getUserByResetToken($token);
                 if ($user !== null) {
